@@ -21,7 +21,7 @@ class GitPortfolio {
     // Intro sequence with typing animation
     startIntroSequence() {
         const introText = "Hi there 👋, I'm Nikhil Bhandarkar\nFull-Stack Dev & Successful VIM Exiter\nI like to solve problems the hard way.";
-        const commandsText = "\nAvailable commands:\n  help     - Show this help message\n  contact  - Display contact information\n  clear    - Collapse all expanded commits\n  ls       - List all projects\n  about    - Show portfolio information\n  show <hash> - Expand specific commit by hash";
+        const commandsText = "\nAvailable commands:\n  help     - Show this help message\n  contact  - Display contact information\n  products - View my products\n  clear    - Collapse all expanded commits\n  ls       - List all projects\n  about    - Show portfolio information\n  show <hash> - Expand specific commit by hash";
 
         // Hide git graph initially
         this.gitGraph.style.display = 'none';
@@ -228,6 +228,7 @@ class GitPortfolio {
 Available commands:
   help     - Show this help message
   contact  - Display contact information
+  products - View my products
   clear    - Collapse all expanded commits
   ls       - List all projects
   about    - Show portfolio information
@@ -263,6 +264,16 @@ Available commands:
 
 I like to solve problems the hard way.
                 `;
+                break;
+
+            case 'products':
+                output = `
+🛍️ Opening products page...
+                `;
+                // Open products page in new tab
+                setTimeout(() => {
+                    window.open('products/', '_blank');
+                }, 500);
                 break;
 
             default:

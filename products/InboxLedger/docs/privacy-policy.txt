@@ -1,0 +1,52 @@
+# Privacy Policy
+
+## Last Updated: January 20, 2025
+
+This Privacy Policy describes how the Expense Tracker Sheets Add-on ("we", "us", or "our") collects, uses, and protects your information when you use our Google Workspace add-on.
+
+## Information We Collect
+
+### Data You Provide
+- Expense data you enter into Google Sheets
+- Google account information (managed by Google)
+
+### Automatically Collected Data
+- Usage analytics (anonymized)
+- Error logs for troubleshooting
+
+## How We Use Your Information
+
+We use the collected information to:
+- Provide and maintain the add-on functionality
+- Improve user experience and features
+- Ensure security and prevent abuse
+- Comply with legal obligations
+
+## Data Storage and Security
+
+- All data remains in your Google account
+- We do not store personal data on external servers
+- Data is protected by Google's security measures
+- You can delete all data by uninstalling the add-on
+
+## Third-Party Services
+
+This add-on integrates with:
+- Google Workspace (Sheets, Drive)
+- Google Analytics (usage statistics only)
+
+## Your Rights
+
+You have the right to:
+- Access your data
+- Delete your data
+- Withdraw consent
+- File complaints
+
+## Contact Us
+
+For privacy questions, contact: privacy@nikhilbuilds.xyz
+
+## Changes to This Policy
+
+We may update this policy. Significant changes will be communicated via the add-on or email.

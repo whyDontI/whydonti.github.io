@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Consent Justification - InboxLedger</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-content">
+            <a href="index.html" class="nav-back">
+                <span class="nav-arrow">←</span> Back to Product
+            </a>
+            <h1 class="nav-title">OAuth Consent</h1>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="doc-content">
+        <div class="doc-container">
+            <h1>OAuth Consent Screen Justification</h1>
+
+            <h2>Purpose of Use for Gmail Modify Access</h2>
+
+            <h3>Essential Functionality</h3>
+            <p>InboxLedger requires <code>gmail.modify</code> scope to read, search, and organize users' Gmail messages for bank transaction emails. This access enables both scanning emails and applying organizational labels.</p>
+
+            <h3>Why This Scope is Required</h3>
+            <ul>
+                <li><strong>Primary Feature</strong>: The add-on searches for emails from bank institutions containing transaction data</li>
+                <li><strong>Data Source</strong>: Bank statements and alerts are commonly delivered via email rather than direct API access</li>
+                <li><strong>User Benefit</strong>: Eliminates manual expense entry by automatically extracting transaction information</li>
+                <li><strong>No Alternative</strong>: Without Gmail access, users would need to manually forward emails or enter data, defeating the automation purpose</li>
+            </ul>
+
+            <h3>Limited Data Access</h3>
+            <ul>
+                <li><strong>Read & Organize</strong>: The scope allows reading email content and applying organizational labels</li>
+                <li><strong>Filtered Search</strong>: Uses specific Gmail search queries to target only relevant bank transaction emails</li>
+                <li><strong>Label Management</strong>: Creates and applies labels to help users track processed emails</li>
+                <li><strong>User Control</strong>: Users specify exactly which bank email addresses to monitor</li>
+                <li><strong>No Data Storage</strong>: Extracted data is immediately processed into Google Sheets; no external storage</li>
+            </ul>
+
+            <h3>User Experience Impact</h3>
+            <p>Without <code>gmail.modify</code> access:</p>
+            <ul>
+                <li>Users cannot scan emails for transactions (read access blocked)</li>
+                <li>Users cannot apply organizational labels to track processed emails</li>
+                <li>Manual data entry becomes necessary, removing the automation and organization value</li>
+                <li>The add-on becomes a basic spreadsheet tool rather than an intelligent expense tracker</li>
+            </ul>
+
+            <h3>Security Considerations</h3>
+            <ul>
+                <li><strong>Minimal Permissions</strong>: Only requests read access, not modify/delete permissions</li>
+                <li><strong>Transparent Usage</strong>: All data access is clearly explained to users before installation</li>
+                <li><strong>Google Infrastructure</strong>: All processing occurs within Google's secure environment</li>
+                <li><strong>User Consent</strong>: Users must explicitly grant permission and can revoke access anytime</li>
+            </ul>
+
+            <h3>Compliance with Google Policies</h3>
+            <ul>
+                <li><strong>Limited Use</strong>: Data is accessed only for expense tracking automation</li>
+                <li><strong>User Data Policy</strong>: Fully compliant with Google's API Services User Data Policy</li>
+                <li><strong>No Data Sharing</strong>: Transaction data remains within the user's Google account</li>
+            </ul>
+
+            <hr>
+            <p><em>This scope is essential for the add-on to provide its intended functionality of automated expense tracking from email sources.</em></p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

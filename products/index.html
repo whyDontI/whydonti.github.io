@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Nikhil Bhandarkar</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-content">
+            <a href="../index.html" class="nav-back">
+                <span class="nav-arrow">←</span> Back to Portfolio
+            </a>
+            <h1 class="nav-title">Products</h1>
+        </div>
+    </header>
+
+    <!-- Products Showcase -->
+    <main class="products-container">
+        <div class="products-hero">
+            <h1 class="products-title">My Products</h1>
+            <p class="products-subtitle">Google Workspace add-ons and tools built to solve real workflow problems</p>
+        </div>
+
+        <div class="products-grid">
+            <a href="expense-tracker-sheets-addon/" class="product-card">
+                <div class="product-card-header">
+                    <div class="product-icon">📊</div>
+                    <div class="product-category">Google Workspace Add-on</div>
+                </div>
+                <h2 class="product-name">Expense Tracker Sheets Add-on</h2>
+                <p class="product-description">
+                    Transform Google Sheets into a professional expense tracking tool with automated categorization, data validation, and real-time calculations.
+                </p>
+                <div class="product-features">
+                    <span class="feature-tag">Google Workspace</span>
+                    <span class="feature-tag">Formula Integration</span>
+                    <span class="feature-tag">Data Validation</span>
+                </div>
+                <div class="product-link">
+                    Learn More <span class="link-arrow">→</span>
+                </div>
+            </a>
+
+            <!-- Future products can be added here -->
+            <div class="product-card coming-soon">
+                <div class="product-card-header">
+                    <div class="product-icon">🚧</div>
+                    <div class="product-category">Coming Soon</div>
+                </div>
+                <h2 class="product-name">More Products</h2>
+                <p class="product-description">
+                    I'm always building new tools and solutions. Stay tuned for more products!
+                </p>
+                <div class="product-features">
+                    <span class="feature-tag">In Development</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-cta">
+            <h2>Have an idea?</h2>
+            <p>I'm always open to building custom solutions. Let's discuss your project!</p>
+            <a href="../index.html" class="cta-button" onclick="window.parent.postMessage({type: 'navigate', command: 'contact'}, '*')">
+                Get In Touch
+            </a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Terms of Service
+
+## Last Updated: January 20, 2025
+
+Welcome to the Expense Tracker Sheets Add-on. These Terms of Service ("Terms") govern your use of our Google Workspace add-on.
+
+## Acceptance of Terms
+
+By installing and using this add-on, you agree to these Terms. If you disagree, please uninstall the add-on.
+
+## Description of Service
+
+The Expense Tracker Sheets Add-on enhances Google Sheets with expense tracking capabilities including categorization, calculations, and data validation.
+
+## User Responsibilities
+
+You agree to:
+- Use the add-on lawfully and ethically
+- Not attempt to reverse engineer or modify the code
+- Respect Google's Terms of Service
+- Keep your Google account secure
+
+## Service Availability
+
+- The add-on is provided "as is"
+- We strive for high availability but cannot guarantee 100% uptime
+- Service may be temporarily unavailable for maintenance
+
+## Limitation of Liability
+
+To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages.
+
+## Termination
+
+We reserve the right to terminate or suspend access to the service at our discretion.
+
+## Governing Law
+
+These Terms are governed by applicable law. Any disputes shall be resolved in the appropriate jurisdiction.
+
+## Changes to Terms
+
+We may modify these Terms. Continued use after changes constitutes acceptance.
+
+## Contact Information
+
+For questions about these Terms, contact: legal@nikhilbuilds.xyz

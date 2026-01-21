@@ -1,0 +1,63 @@
+# Changelog
+
+All notable changes to the Expense Tracker Sheets Add-on will be documented in this file.
+
+## [1.2.0] - 2025-01-20
+
+### Added
+- Real-time expense validation
+- Enhanced categorization with custom categories
+- Export functionality to PDF
+- Mobile-responsive improvements
+
+### Fixed
+- Date format validation issues
+- Calculation errors with large datasets
+- Memory usage optimization
+
+## [1.1.0] - 2024-12-15
+
+### Added
+- Tax calculation formulas
+- Multi-currency support
+- Bulk expense import feature
+- Advanced filtering options
+
+### Changed
+- Improved user interface design
+- Faster loading times
+
+### Fixed
+- Compatibility issues with Google Workspace updates
+- Minor bug fixes
+
+## [1.0.0] - 2024-11-01
+
+### Added
+- Initial release of Expense Tracker Sheets Add-on
+- Basic expense tracking functionality
+- Automated categorization
+- Data validation
+- Google Workspace integration
+
+### Features
+- Expense entry and management
+- Category dropdown menus
+- Basic calculations (sum, average)
+- Google Sheets integration
+- Data export capabilities
+
+---
+
+## Version Numbering
+
+We use [Semantic Versioning](https://semver.org/) for version numbers:
+
+- **MAJOR.MINOR.PATCH**
+- MAJOR version for incompatible API changes
+- MINOR version for backwards-compatible functionality additions
+- PATCH version for backwards-compatible bug fixes
+
+## Support
+
+For support or questions about updates, contact: support@nikhilbuilds.xyz

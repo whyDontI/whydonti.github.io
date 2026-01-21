@@ -1,0 +1,119 @@
+# User Guide - Expense Tracker Sheets Add-on
+
+## Getting Started
+
+Welcome to the Expense Tracker Sheets Add-on! This guide will help you get started with tracking your expenses efficiently.
+
+## Installation
+
+1. Visit the [Google Workspace Marketplace](https://workspace.google.com/marketplace)
+2. Search for "Expense Tracker Sheets Add-on"
+3. Click "Install"
+4. Grant necessary permissions
+5. Open Google Sheets and access the add-on from the Extensions menu
+
+## Setting Up Your Expense Sheet
+
+### 1. Create a New Sheet
+- Open Google Sheets
+- Create a new spreadsheet
+- Name it appropriately (e.g., "Monthly Expenses")
+
+### 2. Set Up Headers
+Create the following column headers in row 1:
+- **Date** (Column A)
+- **Description** (Column B)
+- **Category** (Column C)
+- **Amount** (Column D)
+- **Payment Method** (Column E)
+
+### 3. Enable the Add-on
+1. Go to Extensions → Expense Tracker → Enable
+2. The add-on will automatically format your sheet
+
+## Using the Add-on
+
+### Adding Expenses
+
+1. **Manual Entry**: Type expenses directly into the formatted rows
+2. **Data Validation**: The add-on will validate your entries automatically
+3. **Categorization**: Use the dropdown menu in the Category column
+
+### Features Available
+
+#### Smart Categorization
+- Pre-defined categories: Food, Transportation, Utilities, Entertainment, etc.
+- Add custom categories as needed
+
+#### Automatic Calculations
+- Row totals are calculated automatically
+- Monthly summaries appear at the bottom
+- Tax calculations (configurable)
+
+#### Data Validation
+- Date format checking
+- Amount format validation
+- Required field enforcement
+
+## Advanced Features
+
+### Custom Categories
+1. Go to Extensions → Expense Tracker → Settings
+2. Add custom categories
+3. Categories will appear in dropdown menus
+
+### Export Options
+- Export to PDF for record keeping
+- CSV export for accounting software
+- Monthly summary reports
+
+### Multi-Sheet Support
+- Use multiple sheets for different expense types
+- Consolidated reports across sheets
+
+## Troubleshooting
+
+### Common Issues
+
+#### Add-on Not Loading
+- Refresh the Google Sheets page
+- Check your internet connection
+- Ensure you have proper permissions
+
+#### Formulas Not Working
+- Make sure the sheet is properly formatted
+- Check that all required columns are present
+- Try re-enabling the add-on
+
+#### Data Validation Errors
+- Ensure dates are in MM/DD/YYYY format
+- Check that amounts contain only numbers and decimals
+- Verify all required fields are filled
+
+### Getting Help
+
+- Check the FAQ section in the add-on menu
+- Visit our [support page](https://nikhilbuilds.xyz/support)
+- Contact support: support@nikhilbuilds.xyz
+
+## Tips and Best Practices
+
+1. **Consistent Formatting**: Always use the same date format
+2. **Regular Backups**: Export your data regularly
+3. **Category Consistency**: Use consistent category names
+4. **Monthly Reviews**: Review expenses monthly for budgeting
+
+## Security and Privacy
+
+- All data stays in your Google account
+- No external data storage
+- Protected by Google's security measures
+- You control all access permissions
+
+---
+
+## Need More Help?
+
+For additional support or feature requests, please contact our support team. We're here to help you make the most of your expense tracking!
+
+**Happy Tracking!** 📊
