@@ -237,10 +237,12 @@ Available commands:
 
             case 'contact':
                 output = `
-📧 Email: <span class="clickable-email" data-email="nikhil@example.com">nikhilbhandarkar1998@gmail.com</span>
-💼 LinkedIn: <a href="https://www.linkedin.com/in/nikhil-bhandarkar/" target="_blank" class="contact-link">linkedin.com/in/nikhil-bhandarkar/</a>
-🐙 GitHub: <a href="https://github.com/whydonti" target="_blank" class="contact-link">github.com/whydonti</a>
+👋 Opening contact page...
                 `;
+                // Open contact page in new tab
+                setTimeout(() => {
+                    window.open('contact.html', '_blank');
+                }, 500);
                 break;
 
             case 'clear':

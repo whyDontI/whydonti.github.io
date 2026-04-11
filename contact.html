@@ -1,0 +1,155 @@
+<!--
+    GOOGLE FORM SETUP INSTRUCTIONS:
+
+    1. Go to Google Forms (forms.google.com)
+    2. Create a new form with these questions:
+       - Name (Short answer, Required)
+       - Email (Short answer, Required)
+       - Subject (Multiple choice: Project Collaboration, Job Opportunity, Consulting, Feedback, Other)
+       - Message (Paragraph, Required)
+    3. Click "Send" button
+    4. Click the embed icon (< >)
+    5. Copy the src URL from the embed code
+    6. Replace "YOUR_GOOGLE_FORM_ID_HERE" in the iframe src below with your form ID
+
+    Example: https://docs.google.com/forms/d/e/YOUR_ACTUAL_FORM_ID/viewform?embedded=true
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Nikhil Bhandarkar</title>
+    <link rel="icon" type="image/webp" href="products/inboxledger/logos/32X32InboxLedgerLogo.webp">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="contact.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-content">
+            <a href="index.html" class="nav-back">
+                <span class="nav-arrow">←</span> Back to Portfolio
+            </a>
+            <h1 class="nav-title">Contact</h1>
+        </div>
+    </header>
+
+    <!-- Contact Container -->
+    <main class="contact-container">
+        <div class="contact-hero">
+            <h1 class="contact-title">Let's Connect</h1>
+            <p class="contact-subtitle">I'm always interested in new opportunities, collaborations, and interesting projects</p>
+        </div>
+
+        <div class="contact-content">
+            <!-- Contact Form -->
+            <section class="contact-form-section">
+                <h2>Send a Message</h2>
+                <div class="form-intro">
+                    <p>Fill out the form below and I'll get back to you within 24 hours.</p>
+                </div>
+                <div class="google-form-container">
+                    <iframe
+                        src="https://docs.google.com/forms/d/e/YOUR_GOOGLE_FORM_ID_HERE/viewform?embedded=true"
+                        width="100%"
+                        height="600"
+                        frameborder="0"
+                        marginheight="0"
+                        marginwidth="0"
+                        class="google-form-iframe">
+                        Loading contact form...
+                    </iframe>
+                </div>
+                <div class="form-note">
+                    <p>💡 <strong>Tip:</strong> After submitting, you'll receive a confirmation. I typically respond within 24 hours.</p>
+                </div>
+            </section>
+
+            <!-- Contact Info -->
+            <section class="contact-info-section">
+                <h2>Get In Touch</h2>
+
+                <div class="contact-methods">
+                    <div class="contact-method">
+                        <div class="method-icon">📧</div>
+                        <div class="method-content">
+                            <h3>Email</h3>
+                            <p>Drop me a line anytime</p>
+                            <a href="mailto:nikhilbhandarkar1998@gmail.com" class="contact-link">
+                                nikhilbhandarkar1998@gmail.com
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon">💼</div>
+                        <div class="method-content">
+                            <h3>LinkedIn</h3>
+                            <p>Connect professionally</p>
+                            <a href="https://www.linkedin.com/in/nikhil-bhandarkar/" target="_blank" class="contact-link">
+                                linkedin.com/in/nikhil-bhandarkar/
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon">🐙</div>
+                        <div class="method-content">
+                            <h3>GitHub</h3>
+                            <p>Check out my code</p>
+                            <a href="https://github.com/whydonti" target="_blank" class="contact-link">
+                                github.com/whydonti
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon">📍</div>
+                        <div class="method-content">
+                            <h3>Location</h3>
+                            <p>Based in India</p>
+                            <span class="contact-text">Available for remote work worldwide</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Availability Status -->
+                <div class="availability-status">
+                    <div class="status-indicator available"></div>
+                    <span class="status-text">Available for new projects</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>What type of projects do you work on?</h3>
+                    <p>I specialize in full-stack development, automation tools, and Google Workspace integrations. I'm particularly passionate about building solutions that solve real problems.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Do you work remotely?</h3>
+                    <p>Yes! I'm based in India and have extensive experience working with international teams and clients remotely.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>What technologies do you use?</h3>
+                    <p>I work with modern web technologies, cloud platforms, and automation tools. My current stack includes React, Node.js, Python, Google Apps Script, and various cloud services.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3>How quickly do you respond?</h3>
+                    <p>I typically respond to messages within 24 hours. For urgent inquiries, feel free to follow up.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="contact.js"></script>
+</body>
+</html>
