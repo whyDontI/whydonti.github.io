@@ -1,0 +1,124 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import Base from "../layouts/Base.astro";
+import { projects } from "../data/projects.ts";
+
+const hasImage = (src?: string) => !!src && fs.existsSync(path.join(process.cwd(), "public", src));
+---
+
+<Base title="Projects · Nikhil Bhandarkar">
+  <h1>Projects</h1>
+  <p class="muted">Things I've built and maintain.</p>
+
+  <div class="grid">
+    {
+      projects.map((project) => (
+        <div class="card">
+          {hasImage(project.image) && (
+            <a href={project.url} target="_blank" rel="noopener" class="card-image-link">
+              <img class="card-image" src={project.image} alt={`${project.title} preview`} loading="lazy" />
+            </a>
+          )}
+          <div class="card-body">
+            <a class="card-title" href={project.url} target="_blank" rel="noopener">
+              {project.title} ↗
+            </a>
+            <p class="muted card-desc" set:html={project.description} />
+            <div class="card-foot">
+              <span class="muted mono stack">{project.stack}</span>
+              <span class="links">
+                {project.links.map((link) => {
+                  const isExternal = link.url.startsWith("http");
+                  return (
+                    <a href={link.url} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noopener" : undefined}>
+                      [{link.text}]
+                    </a>
+                  );
+                })}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <style>
+    h1 {
+      font-family: "Fraunces", var(--font-body);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-image-link {
+      display: block;
+      line-height: 0;
+    }
+    .card-image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border);
+    }
+    .card-body {
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .card-title:hover {
+      color: var(--accent);
+    }
+    .card-desc {
+      margin: 0;
+      font-size: 0.92rem;
+      flex-grow: 1;
+    }
+    .card-foot {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+    }
+    .stack {
+      white-space: nowrap;
+    }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.75rem;
+    }
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: var(--font-mono);
+    }
+    .links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</Base>
