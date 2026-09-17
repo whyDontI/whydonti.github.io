@@ -1,0 +1,282 @@
+---
+import Base from "../layouts/Base.astro";
+import { summaryParagraphs, work, skills, education } from "../data/resume.ts";
+import { resumePdfUrl } from "../data/site.ts";
+
+const VISIBLE_BULLETS = 3;
+---
+
+<Base title="Résumé · Nikhil Bhandarkar">
+  <div class="header-row">
+    <h1>Résumé</h1>
+    <a class="pdf-link" href={resumePdfUrl} target="_blank" rel="noopener">Download PDF ↓</a>
+  </div>
+
+  <div class="summary">
+    {summaryParagraphs.map((paragraph) => <p set:html={paragraph} />)}
+  </div>
+
+  <nav class="quick-nav">
+    <a href="#work">Work history</a>
+    <a href="#skills">Skills</a>
+    <a href="#education">Education</a>
+  </nav>
+
+  <hr />
+
+  <section id="work">
+    <h2 class="label">Work history</h2>
+    <div class="entries">
+      {
+        work.map((job) => {
+          const visible = job.bullets.slice(0, VISIBLE_BULLETS);
+          const rest = job.bullets.slice(VISIBLE_BULLETS);
+          return (
+            <div class="entry">
+              <div class="entry-head">
+                <div>
+                  <strong>{job.title}</strong>
+                  <p class="muted org">
+                    {job.org} · {job.location}
+                  </p>
+                </div>
+                <span class="muted mono dates">{job.dates}</span>
+              </div>
+              <p class="muted context">{job.context}</p>
+              {job.tags.length > 0 && (
+                <div class="tags">
+                  {job.tags.map((tag) => (
+                    <span class="tag">{tag}</span>
+                  ))}
+                </div>
+              )}
+              <div class="job-bullets">
+                <ul class="bullets">
+                  {visible.map((bullet) => (
+                    <li set:html={bullet} />
+                  ))}
+                  {rest.map((bullet) => (
+                    <li class="extra" set:html={bullet} />
+                  ))}
+                </ul>
+                {rest.length > 0 && (
+                  <button class="more-toggle" type="button" data-more-count={rest.length}>
+                    Show {rest.length} more
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </section>
+
+  <hr />
+
+  <section id="skills">
+    <h2 class="label">Skills</h2>
+    <div class="skills">
+      {
+        skills.map((group) => (
+          <div class="skill-row">
+            <strong class="skill-label">{group.label}</strong>
+            <div class="skill-pills">
+              {group.value.split(", ").map((item) => (
+                <span class="pill">{item}</span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <hr />
+
+  <section id="education">
+    <h2 class="label">Education</h2>
+    {
+      education.map((entry) => (
+        <div class="entry">
+          <div class="entry-head">
+            <strong>{entry.degree}</strong>
+            <span class="muted mono dates">{entry.dates}</span>
+          </div>
+          <p class="muted org">{entry.org}</p>
+        </div>
+      ))
+    }
+  </section>
+
+  <hr />
+
+  <p class="muted">
+    See <a href="/projects">Projects</a> for what I've built.
+  </p>
+
+  <style>
+    .header-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .header-row h1 {
+      margin: 0;
+    }
+    .pdf-link {
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    .summary {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .summary p {
+      margin: 0;
+    }
+    .quick-nav {
+      display: flex;
+      gap: 1.25rem;
+      margin: 1.5rem 0 0;
+      font-size: 0.85rem;
+    }
+    .quick-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .quick-nav a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 0 0 1.25rem;
+    }
+    .entries {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .entry {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.4rem;
+    }
+    .entry-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .entry-head strong {
+      font-size: 1.02rem;
+    }
+    .dates {
+      white-space: nowrap;
+      font-size: 0.85rem;
+    }
+    .org {
+      margin: 0.1rem 0 0;
+      font-size: 0.92rem;
+    }
+    .context {
+      margin: 0.6rem 0 0;
+      font-size: 0.85rem;
+    }
+    .tags {
+      margin-top: 0.85rem;
+    }
+    .bullets {
+      margin: 0.9rem 0 0;
+      padding-left: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .bullets li {
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+    .bullets li::marker {
+      color: var(--accent);
+    }
+    .bullets li.extra {
+      display: none;
+    }
+    .job-bullets.expanded .bullets li.extra {
+      display: list-item;
+    }
+    .more-toggle {
+      margin-top: 0.75rem;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .more-toggle:hover {
+      text-decoration: underline;
+    }
+    .more-toggle::before {
+      content: "+ ";
+    }
+    .job-bullets.expanded .more-toggle::before {
+      content: "− ";
+    }
+    .skills {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+    .skill-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.75rem;
+      align-items: baseline;
+    }
+    .skill-label {
+      font-size: 0.88rem;
+    }
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .pill {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 0.15rem 0.65rem;
+    }
+    @media (max-width: 560px) {
+      .skill-row {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+    }
+  </style>
+
+  <script>
+    document.querySelectorAll<HTMLButtonElement>(".more-toggle").forEach((btn) => {
+      const wrap = btn.closest(".job-bullets");
+      const count = btn.dataset.moreCount;
+      if (!wrap || !count) return;
+      btn.addEventListener("click", () => {
+        const expanded = wrap.classList.toggle("expanded");
+        btn.textContent = expanded ? "Hide" : `Show ${count} more`;
+      });
+    });
+  </script>
+</Base>
