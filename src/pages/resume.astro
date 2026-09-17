@@ -6,11 +6,18 @@ import { resumePdfUrl } from "../data/site.ts";
 const VISIBLE_BULLETS = 3;
 ---
 
-<Base title="Résumé · Nikhil Bhandarkar">
+<Base
+  title="Résumé · Nikhil Bhandarkar"
+  description="Nikhil Bhandarkar's résumé: Senior Full-Stack Engineer / Software Engineer / Backend Developer. Python/Django, Node.js/TypeScript, React, Rust, AI/LLM in production."
+>
   <div class="header-row">
     <h1>Résumé</h1>
     <a class="pdf-link" href={resumePdfUrl} target="_blank" rel="noopener">Download PDF ↓</a>
   </div>
+
+  <p class="role-line muted mono">
+    Senior Full-Stack Engineer · Python/Django · Node.js/TypeScript · React · Rust · AI/LLM in Production
+  </p>
 
   <div class="summary">
     {summaryParagraphs.map((paragraph) => <p set:html={paragraph} />)}
@@ -129,6 +136,10 @@ const VISIBLE_BULLETS = 3;
     .pdf-link {
       font-size: 0.9rem;
       white-space: nowrap;
+    }
+    .role-line {
+      font-size: 0.85rem;
+      margin: 0.75rem 0 1.5rem;
     }
     .summary {
       display: flex;
