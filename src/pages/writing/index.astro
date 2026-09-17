@@ -1,0 +1,51 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("writing", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<Base title="Writing · Nikhil Bhandarkar">
+  <h1>Writing</h1>
+  <p class="muted">Blog posts and notes.</p>
+
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/writing/${post.slug}`}>{post.data.title}</a>
+          <span class="muted mono date">
+            {post.data.date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+          </span>
+          {post.data.description && <p class="muted description">{post.data.description}</p>}
+        </li>
+      ))
+    }
+  </ul>
+
+  <style>
+    .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .post-list li {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.25rem 1rem;
+    }
+    .description {
+      flex-basis: 100%;
+      margin: 0;
+    }
+    .date {
+      white-space: nowrap;
+    }
+  </style>
+</Base>
