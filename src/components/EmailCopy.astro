@@ -1,0 +1,63 @@
+---
+interface Props {
+  email: string;
+}
+
+const { email } = Astro.props;
+---
+
+<span class="email-copy" data-email={email}>
+  <span class="email-text">{email}</span>
+  <button class="copy-btn" type="button" aria-label="Copy email address">Copy</button>
+</span>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".email-copy").forEach((wrap) => {
+    const btn = wrap.querySelector("button");
+    const email = wrap.dataset.email;
+    if (!btn || !email) return;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(email);
+        const original = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 1500);
+      } catch {
+        // Clipboard API unavailable — fall back to selecting the text.
+        const range = document.createRange();
+        range.selectNode(wrap.querySelector(".email-text")!);
+        window.getSelection()?.removeAllRanges();
+        window.getSelection()?.addRange(range);
+      }
+    });
+  });
+</script>
+
+<style>
+  .email-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .email-text {
+    font-family: var(--font-mono);
+    font-size: 0.95em;
+  }
+  .copy-btn {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .copy-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+</style>
