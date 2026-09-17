@@ -1,0 +1,145 @@
+---
+import Base from "../layouts/Base.astro";
+import EmailCopy from "../components/EmailCopy.astro";
+import { resumePdfUrl } from "../data/site.ts";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("writing", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<Base
+  title="Nikhil Bhandarkar · Full-Stack Engineer"
+  description="Nikhil Bhandarkar is a full-stack engineer working across Django, Node.js/TypeScript, React, and Rust. Writing, projects, and résumé."
+>
+  <header class="hero">
+    <div class="hero-text">
+      <h1>Hey, I am Nikhil</h1>
+      <p class="tagline">full-stack engineer, always building.</p>
+      <!-- Edit this bio freely -->
+      <p>
+        I build full-stack products end to end, from backend systems to the interfaces
+        people use every day. Currently a full-stack engineer at
+        <a href="https://www.vividly.com" target="_blank" rel="noopener">Vividly</a>.
+        See the full history on the <a href="/resume">résumé</a> page.
+      </p>
+    </div>
+    <!-- Drop your photo at /public/photo.png (square, ~320px) -->
+    <img class="photo" src="/photo.png" alt="Nikhil Bhandarkar" width="200" height="200" />
+  </header>
+
+  {
+    /*
+    Writing section is hidden until there's something to publish. Re-add when ready:
+
+    <section>
+      <h2 class="label">Recent writing</h2>
+      {posts.length === 0 && <p class="muted">Nothing published yet.</p>}
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li>
+            <a href={`/writing/${post.slug}`}>{post.data.title}</a>
+            <span class="muted mono date">
+              {post.data.date.toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p><a href="/writing">All writing →</a></p>
+    </section>
+
+    <hr />
+    */
+  }
+
+  <section>
+    <h2 class="label">Elsewhere</h2>
+    <p class="elsewhere-row">
+      <EmailCopy email="nikhilbhandarkar1998@gmail.com" />
+      <span class="muted">·</span>
+      <a href="https://www.linkedin.com/in/nikhil-bhandarkar/" target="_blank" rel="noopener">LinkedIn</a>
+      <span class="muted">·</span>
+      <a href="https://github.com/whydonti" target="_blank" rel="noopener">GitHub</a>
+      <span class="muted">·</span>
+      <a href={resumePdfUrl} target="_blank" rel="noopener">Résumé (PDF)</a>
+    </p>
+  </section>
+
+  <style>
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .hero-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .hero h1 {
+      font-family: "Fraunces", var(--font-body);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 2.5rem;
+      margin: 0 0 0.25rem;
+      line-height: 1.1;
+    }
+    .tagline {
+      font-family: "Fraunces", var(--font-body);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--accent);
+      font-size: 1.15rem;
+      margin: 0 0 1rem;
+    }
+    .photo {
+      width: 160px;
+      height: 160px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: var(--accent-soft);
+      flex-shrink: 0;
+    }
+    @media (max-width: 560px) {
+      .hero {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 1.25rem;
+      }
+      .photo {
+        width: 120px;
+        height: 120px;
+      }
+    }
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 0 0 0.75rem;
+    }
+    .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .post-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .date {
+      white-space: nowrap;
+    }
+    .elsewhere-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</Base>
