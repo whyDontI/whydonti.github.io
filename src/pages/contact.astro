@@ -1,0 +1,50 @@
+---
+import Base from "../layouts/Base.astro";
+import EmailCopy from "../components/EmailCopy.astro";
+---
+
+<!--
+    GOOGLE FORM SETUP:
+    1. Go to forms.google.com, create a form with: Name, Email, Subject, Message.
+    2. Click Send → the embed icon (< >) → copy the src URL.
+    3. Replace YOUR_GOOGLE_FORM_ID_HERE below with your form ID.
+-->
+<Base title="Contact · Nikhil Bhandarkar">
+  <h1>Contact</h1>
+  <p class="muted">Fill out the form below, or reach me directly.</p>
+  <iframe
+    class="form"
+    src="https://docs.google.com/forms/d/e/1FAIpQLSeLHEUGugK7pk03tFAuQWv6sg1S1x13lKn-5BM8UjzeI0MmbA/viewform?embedded=true"
+    width="100%"
+    height="600"
+    frameborder="0"
+    marginheight="0"
+    marginwidth="0"
+  >
+    Loading contact form…
+  </iframe>
+
+  <hr />
+
+  <p class="elsewhere-row">
+    <EmailCopy email="nikhilbhandarkar1998@gmail.com" />
+    <span class="muted">·</span>
+    <a href="https://www.linkedin.com/in/nikhil-bhandarkar/" target="_blank" rel="noopener">LinkedIn</a>
+    <span class="muted">·</span>
+    <a href="https://github.com/whydonti" target="_blank" rel="noopener">GitHub</a>
+  </p>
+
+  <style>
+    .form {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+    .elsewhere-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</Base>
