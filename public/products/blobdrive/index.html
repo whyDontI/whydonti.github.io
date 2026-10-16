@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1a1530">
+<script data-goatcounter="https://nikhil-bhandarkar.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>blobDrive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -458,7 +459,22 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var app = $('app');
+  /* Anonymous usage events for GoatCounter (no names, room codes or personal data) */
+  var tracked = {};
+  function track(name, once) {
+    if (once) { if (tracked[name]) return; tracked[name] = true; }
+    var send = function () { window.goatcounter.count({ path: 'blobdrive/' + name, title: name, event: true }); };
+    try {
+      if (window.goatcounter && window.goatcounter.count) send();
+      else setTimeout(function () { try { if (window.goatcounter && window.goatcounter.count) send(); } catch (err) {} }, 2000);
+    } catch (err) {}
+  }
+  window.addEventListener('load', function () {
+    track(window.matchMedia('(pointer: coarse)').matches ? 'visit-phone-or-tablet' : 'visit-desktop', true);
+    if (window.matchMedia('(pointer: coarse) and (orientation: portrait) and (max-width: 820px)').matches) track('rotate-prompt-shown', true);
+  });
   if (!window.THREE) {
+    track('error-3d-library-missing', true);
     $('intro').querySelector('.panel').innerHTML = '<h1>blobDrive</h1><p>The 3D library could not load. Check your connection and reload the page.</p>';
     return;
   }
@@ -1218,7 +1234,7 @@
     mb.className = 'icon-btn menu-btn'; mb.id = 'menuBtn'; mb.setAttribute('aria-label', 'Menu'); mb.setAttribute('aria-expanded', 'false');
     mb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>';
     $('auto').after(mb);
-    function setMenu(on) { menu.classList.toggle('open', on); back.classList.toggle('open', on); mb.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+    function setMenu(on) { if (on) track('menu-open'); menu.classList.toggle('open', on); back.classList.toggle('open', on); mb.setAttribute('aria-expanded', on ? 'true' : 'false'); }
     mb.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); mb.blur(); });
     back.addEventListener('click', function () { setMenu(false); });
     var labels = { view: 'Camera', tod: 'Time', drive: 'Drive' };
@@ -1846,13 +1862,13 @@
   (function () {
     var btn = $('ctlBtn'), modal = $('ctlModal'), list = $('ctlList');
     list.innerHTML = $('keysList').innerHTML;
-    function show(on) { modal.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+    function show(on) { modal.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); if (on) track('controls-open'); }
     btn.addEventListener('click', function () { show(modal.hidden); btn.blur(); });
     $('ctlClose').addEventListener('click', function () { show(false); });
     modal.addEventListener('click', function (e) { if (e.target === modal) show(false); });
     window.addEventListener('keydown', function (e) { if (e.code === 'Escape' && !modal.hidden) show(false); });
   })();
-  function advanceTime() { gameT = (gameT + 0.06) % 1; }
+  function advanceTime() { gameT = (gameT + 0.06) % 1; track('time-of-day-change'); }
   $('tod').addEventListener('click', function () { advanceTime(); this.blur(); });
   var fsBtn = $('fsBtn'), fsRoot = document.documentElement;
   var fsReq = fsRoot.requestFullscreen || fsRoot.webkitRequestFullscreen;
@@ -1861,7 +1877,7 @@
     if (!fsReq) return;
     try {
       if (fsActive()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-      else { var r = fsReq.call(fsRoot); if (r && r.catch) r.catch(function () {}); }
+      else { track('fullscreen-enter'); var r = fsReq.call(fsRoot); if (r && r.catch) r.catch(function () {}); }
     } catch (err) {}
   }
   function fsSync() { fsBtn.classList.toggle('muted', fsActive()); fsBtn.setAttribute('aria-label', fsActive() ? 'Exit full screen' : 'Full screen'); }
@@ -1872,7 +1888,7 @@
     document.addEventListener('webkitfullscreenchange', fsSync);
   }
   var soundBtn = $('sound');
-  function toggleSound() { audio.setMuted(!audio.muted); soundBtn.classList.toggle('muted', audio.muted); }
+  function toggleSound() { audio.setMuted(!audio.muted); soundBtn.classList.toggle('muted', audio.muted); track(audio.muted ? 'sound-off' : 'sound-on'); }
   soundBtn.addEventListener('click', toggleSound);
   /* Optional real engine recording chosen by the player. It is kept in this browser for next time. */
   var engFile = $('engFile'), engStatus = $('engStatus'), engPreset = $('engPreset'), engClear = $('engClear'), toastEl = $('toast');
@@ -1932,6 +1948,7 @@
   engFile.addEventListener('change', function () {
     var f = engFile.files && engFile.files[0];
     if (!f) return;
+    track('engine-custom-file');
     if (f.size > 40 * 1024 * 1024) { toast('That file is too large. Pick one under 40 MB.'); engFile.value = ''; return; }
     var rd = new FileReader();
     rd.onload = function () { useEngineBytes(rd.result, f.name, true); };
@@ -1947,7 +1964,7 @@
     audio.pendingBytes = null; engName = ''; audio.pitchTrim = 1; store.del(); showEngine();
     if (audio.ctx) audio.decodeBuiltin();
   }
-  engPreset.addEventListener('change', applyPreset);
+  engPreset.addEventListener('change', function () { track('engine-preset-' + engPreset.value); applyPreset(); });
   try { var savedPreset = localStorage.getItem('bd-engpreset'); if (savedPreset === 'jeep' || savedPreset === 'v8') { engPreset.value = savedPreset; audio.preset = savedPreset; } } catch (err) {}
   showEngine();
   engClear.addEventListener('click', function () {
@@ -1990,6 +2007,7 @@
   mixBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     var open = mixer.classList.toggle('open'); mixBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) track('mixer-open');
   });
   mixer.addEventListener('click', function (e) { e.stopPropagation(); });
   document.addEventListener('click', function () { mixer.classList.remove('open'); mixBtn.setAttribute('aria-expanded', 'false'); });
@@ -2001,6 +2019,7 @@
     cozyBtn.classList.toggle('active', on); cozyBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
     try { localStorage.setItem('bd-cozy2', on ? '1' : '0'); } catch (err) {}
     toast(on ? 'Cozy mode on' : 'Cozy mode off');
+    if (started) track(on ? 'cozy-on' : 'cozy-off');
   }
   cozyBtn.classList.toggle('active', cozy.on); cozyBtn.setAttribute('aria-pressed', cozy.on ? 'true' : 'false');
   cozyBtn.addEventListener('click', function (e) { e.stopPropagation(); setCozy(!cozy.on); cozyBtn.blur(); });
@@ -2034,6 +2053,7 @@
     var files = Array.prototype.slice.call(musFile.files || []);
     musFile.value = '';
     if (!files.length) return;
+    track('music-custom-files');
     var total = audio.tracks.reduce(function (a, t) { return a + t.bytes.byteLength; }, 0);
     files.forEach(function (f) { total += f.size; });
     if (total > 300 * 1024 * 1024) { toast('That is too much audio. Keep it under 300 MB in total.'); return; }
@@ -2076,10 +2096,12 @@
   function toggleDrive() {
     if (gear === 'low') return;           // low range always uses all four wheels
     setDrive(drive === '4wd' ? 'rwd' : '4wd');
+    track('drive-' + drive);
     audio.thump(0.3);
   }
   function toggleGear() {
     gear = gear === 'high' ? 'low' : 'high';
+    track('gear-' + gear);
     gearBtn.textContent = gear === 'high' ? 'HIGH' : 'LOW';
     gearBtn.classList.toggle('low', gear === 'low');
     if (gear === 'low') setDrive('4wd');
@@ -2129,7 +2151,7 @@
   var AUTO_V = 7.5, AUTO_ARCS = 15;
   var auto = { on: false, last: 0, planAcc: 1, kappa: 0, steer: 0, vT: 0, psi: 0, wT: 0, rec: 0, mode: 'rev', recDir: 1, stuck: 0, tries: 0, obs: [], holdUntil: 0, paused: false, inWater: false, tight: false, recK: 0, recDn: 1, posT: 0, px: 0, pz: 0, kMax: 0.1, free: 40 };
   var autoBtn = $('auto');
-  function setAuto(on) {
+  function setAuto(on, silent) {
     if (on === auto.on) return;
     auto.on = on;
     auto.holdUntil = 0; auto.paused = false; autoBtn.classList.remove('paused');
@@ -2140,6 +2162,7 @@
       auto.wT = 0; auto.psi = car.th; auto.posT = 0; auto.px = car.x; auto.pz = car.z;
     }
     toast(on ? 'Auto drive on. Press any driving key to take over.' : 'Auto drive off');
+    if (!silent) track(on ? 'auto-on' : 'auto-off');
   }
   autoBtn.addEventListener('click', function () { setAuto(!auto.on); autoBtn.blur(); });
 
@@ -2499,6 +2522,7 @@
     viewIdx = (i + VIEWS.length) % VIEWS.length;
     orbYaw = 0; orbPitch = 0; zoom = 1; resetting = false;
     refreshViewBtn();
+    if (started) track('camera-' + VIEWS[viewIdx].name.toLowerCase());
   }
   /* If you moved the camera, this puts it back. Otherwise it switches to the next view. */
   function camPress() {
@@ -2663,7 +2687,15 @@
     hint.classList.add('on');
     setTimeout(function () { hint.classList.remove('on'); }, 11000);
     audio.start();
-    setAuto(true);
+    setAuto(true, true);
+    track('start'); track(isTouch ? 'start-phone' : 'start-desktop');
+    var activeSec = 0;
+    setInterval(function () {
+      if (document.hidden) return;
+      activeSec += 5;
+      [60, 300, 900, 1800].forEach(function (sec) { if (activeSec >= sec) track('played-' + (sec / 60) + 'min', true); });
+      [1, 5, 10, 25].forEach(function (km) { if (car.dist >= km) track('drove-' + km + 'km', true); });
+    }, 5000);
   }
   $('go').addEventListener('click', begin);
 
@@ -2714,6 +2746,7 @@
     applyOwnColor();
     mpHello();
     mpRender();
+    track('color-auto-switched');
     if (mp.colorManual) toast('Someone in the room already had your colour, so you got a new one.');
   }
   var mpBtn = $('mpBtn'), mpPop = $('mpPop');
@@ -2792,6 +2825,8 @@
       scene.add(p.g);
       p.tag = makeTag(name, color); p.tag.visible = false; scene.add(p.tag);
     } catch (err) {}
+    track('played-together', true);
+    track('room-size-' + (Object.keys(mp.players).length + 1), true);
     mpRender();
     return p;
   }
@@ -2851,7 +2886,7 @@
       if (id === mp.hostId) { var g = +d.g; if (isFinite(g) && g >= 0 && g <= 1) gameT = g; }
     } else if (d.t === 'full') {
       if (mp.quick && mp.quick < MP_PUBLIC) { var nextSlot = mp.quick + 1; mpResetPeer(); mpJoin('public-' + nextSlot, nextSlot); }
-      else { toast(mp.quick ? 'All public rooms are full. Create your own room instead.' : 'That room is full (' + MP_MAX + ' drivers).'); mpLeave(); }
+      else { track(mp.quick ? 'public-rooms-full' : 'room-full'); toast(mp.quick ? 'All public rooms are full. Create your own room instead.' : 'That room is full (' + MP_MAX + ' drivers).'); mpLeave(); }
     }
   }
   function mpWire(conn) {
@@ -2871,7 +2906,7 @@
         others.forEach(function (x) { var c = mp.conns[x]; if (c && c.open) { try { c.send({ t: 'new', id: conn.peer }); } catch (err) {} } });
         try { conn.send({ t: 'tm', g: gameT }); } catch (err) {}
       }
-      if (mp.status === 'connecting') { mp.status = 'room'; mp.quick = 0; }
+      if (mp.status === 'connecting') { if (!mp.host) track(mp.quick ? 'quick-join-success' : 'room-joined'); mp.status = 'room'; mp.quick = 0; }
       mpRender();
     });
     conn.on('data', function (d) { try { mpOnData(conn, d); } catch (err) {} });
@@ -2906,11 +2941,11 @@
           if (mp.joinTries === 1) toast('Looking for the room...');
           delete mp.dialing[mp.hostId];
           setTimeout(function () { if (mp.status === 'connecting' && mp.peer === p) mpDial(mp.hostId); }, 3000);
-        } else { toast('Room not found. Check the code, and that the host still has the game open.'); mpLeave(); }
+        } else { track('room-not-found'); toast('Room not found. Check the code, and that the host still has the game open.'); mpLeave(); }
         return;
       }
       if (type === 'network' || type === 'server-error' || type === 'socket-error' || type === 'socket-closed') {
-        if (mp.status === 'connecting') { toast('Could not reach the connection service. Check your internet.'); mpLeave(); }
+        if (mp.status === 'connecting') { track('connect-failed'); toast('Could not reach the connection service. Check your internet.'); mpLeave(); }
         return;
       }
       if (mp.status === 'connecting') { toast('Could not start multiplayer (' + (type || 'unknown error') + ').'); mpLeave(); }
@@ -2927,6 +2962,7 @@
   });
   function mpReopenHost(code, n) {
     if (mp.status !== 'room' || !mp.host || mp.code !== code || n > 8) return;
+    track('host-reopen');
     var p;
     try { p = new Peer(MP_PREFIX + code); } catch (err) { return; }
     p.on('open', function (id) {
@@ -2972,6 +3008,7 @@
         opened = true;
         if (mp.status !== 'connecting') { try { p.destroy(); } catch (err) {} return; }
         mp.peer = p; mp.myId = id; mp.hostId = id; mp.host = true; mp.code = code; mp.status = 'room'; mp.quick = 0;
+        track(fixed ? 'public-room-hosted' : 'room-created');
         mpSetupPeer(p);
         mpRender();
         toast(fixed ? 'You opened a public room. Others who tap Quick join will land here.' : 'Room ' + code + ' is open. Share the invite link.');
@@ -2981,7 +3018,7 @@
         if (err && err.type === 'unavailable-id' && fixed) { try { p.destroy(); } catch (e) {} mpJoin(fixed, slot); return; }
         if (err && err.type === 'unavailable-id' && tries++ < 6) { try { p.destroy(); } catch (e) {} attempt(); return; }
         try { p.destroy(); } catch (e) {}
-        if (mp.status === 'connecting') { toast('Could not reach the connection service. Check your internet.'); mpLeave(); }
+        if (mp.status === 'connecting') { track('connect-failed'); toast('Could not reach the connection service. Check your internet.'); mpLeave(); }
       });
     })();
   }
@@ -3001,7 +3038,7 @@
       mpDial(mp.hostId);
     });
     p.on('connection', function () {});
-    p.on('error', function () { if (mp.status === 'connecting' && !mp.peer) { toast('Could not reach the connection service. Check your internet.'); mpLeave(); } });
+    p.on('error', function () { if (mp.status === 'connecting' && !mp.peer) { track('connect-failed'); toast('Could not reach the connection service. Check your internet.'); mpLeave(); } });
     var stop = setInterval(function () { if (mp.status !== 'connecting') { clearTimeout(timer); clearInterval(stop); } }, 500);
   }
 
@@ -3111,7 +3148,7 @@
     if (!mpOk) { slot.appendChild(mel('div', 'ep-status', 'Multiplayer could not load its connection library. Check your internet and reload.')); return; }
     var row = mel('div', 'mp-row');
     var nameIn = mel('input', 'mp-input'); nameIn.type = 'text'; nameIn.maxLength = 16; nameIn.value = mp.name; nameIn.placeholder = 'Your name'; nameIn.setAttribute('aria-label', 'Your name');
-    nameIn.addEventListener('input', function () { mp.name = cleanName(nameIn.value); mpSaveMe(); });
+    nameIn.addEventListener('input', function () { track('name-changed', true); mp.name = cleanName(nameIn.value); mpSaveMe(); });
     row.appendChild(nameIn); slot.appendChild(row);
     var sw = mel('div', 'mp-row');
     MP_COLORS.forEach(function (col) {
@@ -3119,7 +3156,8 @@
       var b = mel('button', 'mp-sw' + (col === mp.color ? ' sel' : '') + (taken ? ' taken' : '')); b.type = 'button'; b.style.background = col; b.setAttribute('aria-label', 'Car color ' + col);
       b.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (col !== mp.color && colorTaken(col)) { toast('Another driver already has that colour.'); return; }
+        if (col !== mp.color && colorTaken(col)) { track('color-blocked'); toast('Another driver already has that colour.'); return; }
+        track('color-preset');
         mp.color = col; mp.prefColor = col; mp.colorManual = true; applyOwnColor(); mpSaveMe(); mpRender();
       });
       sw.appendChild(b);
@@ -3131,7 +3169,8 @@
       mp.color = cp.value; mp.prefColor = cp.value; mp.colorManual = true; applyOwnColor(); mpSaveMe();
     });
     cp.addEventListener('change', function () {
-      if (colorTaken(cp.value)) { toast('Another driver already has a colour like that.'); cp.value = mp.color; }
+      if (colorTaken(cp.value)) { track('color-blocked'); toast('Another driver already has a colour like that.'); cp.value = mp.color; }
+      else track('color-custom');
       mpRender();
     });
     sw.appendChild(cp);
@@ -3139,14 +3178,14 @@
     if (mp.status === 'solo') {
       var r2row = mel('div', 'mp-row');
       var create = mel('button', 'ep-btn', 'Create a room'); create.type = 'button';
-      create.addEventListener('click', function (e) { e.stopPropagation(); mpCreate(); });
+      create.addEventListener('click', function (e) { e.stopPropagation(); track('create-room-click'); mpCreate(); });
       var quick = mel('button', 'ep-btn', 'Quick join'); quick.type = 'button'; quick.title = 'Jump into a public room, no code needed';
-      quick.addEventListener('click', function (e) { e.stopPropagation(); mpQuick(); });
+      quick.addEventListener('click', function (e) { e.stopPropagation(); track('quick-join-click'); mpQuick(); });
       r2row.appendChild(create); r2row.appendChild(quick); slot.appendChild(r2row);
       var jr = mel('div', 'mp-row');
       var codeIn = mel('input', 'mp-input'); codeIn.type = 'text'; codeIn.maxLength = 40; codeIn.placeholder = 'Room code, like maple-fox-42'; codeIn.setAttribute('aria-label', 'Room code');
       var join = mel('button', 'ep-btn', 'Join'); join.type = 'button';
-      var go = function () { mpJoin(codeIn.value); };
+      var go = function () { track('room-join-code'); mpJoin(codeIn.value); };
       join.addEventListener('click', function (e) { e.stopPropagation(); go(); });
       codeIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
       jr.appendChild(codeIn); jr.appendChild(join); slot.appendChild(jr);
@@ -3164,6 +3203,7 @@
       var copy = mel('button', 'ep-btn', 'Copy'); copy.type = 'button';
       copy.addEventListener('click', function (e) {
         e.stopPropagation();
+        track('invite-copied');
         try { navigator.clipboard.writeText(link.value).then(function () { toast('Invite link copied'); }, function () { link.select(); toast('Press Ctrl+C to copy'); }); } catch (err) { link.select(); }
       });
       ir.appendChild(link); ir.appendChild(copy); slot.appendChild(ir);
@@ -3176,13 +3216,13 @@
         var ds = mel('span', 'mp-dist', p.has ? Math.round(Math.hypot(p.cur.x - car.x, p.cur.z - car.z)) + ' m' : '...'); ds.setAttribute('data-id', id);
         li.appendChild(ds);
         var go2 = mel('button', 'ep-link', 'Go'); go2.type = 'button'; go2.title = 'Drive to ' + p.name;
-        go2.addEventListener('click', function (e) { e.stopPropagation(); if (p.has) { mpPlaceNear(p); toast('Moved next to ' + p.name); } });
+        go2.addEventListener('click', function (e) { e.stopPropagation(); if (p.has) { track('goto-player'); mpPlaceNear(p); toast('Moved next to ' + p.name); } });
         li.appendChild(go2); ul.appendChild(li);
       });
       slot.appendChild(ul);
       var lr = mel('div', 'mp-row');
       var leave = mel('button', 'ep-link', 'Leave room'); leave.type = 'button';
-      leave.addEventListener('click', function (e) { e.stopPropagation(); mpLeave(); });
+      leave.addEventListener('click', function (e) { e.stopPropagation(); track('room-left'); mpLeave(); });
       lr.appendChild(leave); slot.appendChild(lr);
     }
   }
@@ -3210,7 +3250,8 @@
   function mpInit() {
     mpRender();
     var m = /[?&]room=([A-Za-z0-9-]{3,40})/.exec(location.search);
-    if (m && mpOk) mpJoin(m[1]);
+    if (!mpOk) track('multiplayer-unavailable', true);
+    if (m && mpOk) { track('room-join-link'); mpJoin(m[1]); }
   }
 
   ensureChunks(car.x, car.z, 999);
