@@ -154,6 +154,7 @@
   .mp-input:focus-visible, .mp-sw:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   .mp-sw { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; }
   .mp-sw.sel { border-color: var(--ink); }
+  .mp-sw.taken { opacity: 0.22; cursor: not-allowed; }
   .mp-custom { -webkit-appearance: none; appearance: none; background: conic-gradient(#e05a4f, #e0b04f, #6bbf5e, #4fb5e0, #8a6bd8, #d86ba8, #e05a4f); overflow: hidden; }
   .mp-custom::-webkit-color-swatch-wrapper { padding: 0; }
   .mp-custom::-webkit-color-swatch { border: 0; opacity: 0; }
@@ -2683,7 +2684,7 @@
   try {
     mp.name = localStorage.getItem('bd-name') || '';
     var savedColor = localStorage.getItem('bd-color');
-    if (savedColor && /^#[0-9a-f]{6}$/i.test(savedColor)) { mp.color = savedColor; mp.colorManual = true; }
+    if (savedColor && /^#[0-9a-f]{6}$/i.test(savedColor)) { mp.color = savedColor; mp.prefColor = savedColor; mp.colorManual = true; }
   } catch (err) {}
   /* Nobody picked a colour yet: hand out a random one */
   if (!mp.colorManual) mp.color = MP_AUTO[Math.floor(Math.random() * MP_AUTO.length)];
@@ -2697,20 +2698,23 @@
   });
   function applyOwnColor() { ownBodyMat.color.set(mp.color); }
   function colorDist(a, b) { var A = new THREE.Color(a), B = new THREE.Color(b); return Math.hypot(A.r - B.r, A.g - B.g, A.b - B.b); }
-  /* If we never picked a colour and someone in the room already has one like it, switch to a free one */
+  /* Colours are unique in a room: if two drivers end up alike, the one with the higher id gets a free colour */
+  function colorTaken(c) {
+    return Object.keys(mp.players).some(function (id) { return colorDist(mp.players[id].color, c) < 0.2; });
+  }
   function mpEnsureUnique() {
-    if (mp.colorManual || mp.status !== 'room') return;
+    if (mp.status !== 'room') return;
     var ids = Object.keys(mp.players), clash = false, i;
     for (i = 0; i < ids.length; i++) {
-      var q = mp.players[ids[i]];
-      if (colorDist(q.color, mp.color) < 0.2 && (q.man || mp.myId > ids[i])) clash = true;
+      if (colorDist(mp.players[ids[i]].color, mp.color) < 0.2 && mp.myId > ids[i]) clash = true;
     }
     if (!clash) return;
-    var pool = MP_AUTO.filter(function (c) { return ids.every(function (id) { return colorDist(mp.players[id].color, c) >= 0.2; }); });
+    var pool = MP_AUTO.filter(function (c) { return !colorTaken(c); });
     mp.color = pool.length ? pool[Math.floor(Math.random() * pool.length)] : '#' + new THREE.Color().setHSL(Math.random(), 0.55, 0.5).getHexString();
     applyOwnColor();
     mpHello();
     mpRender();
+    if (mp.colorManual) toast('Someone in the room already had your colour, so you got a new one.');
   }
   var mpBtn = $('mpBtn'), mpPop = $('mpPop');
 
@@ -3098,7 +3102,7 @@
   /* panel */
   function mel(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function mpSaveMe() {
-    try { localStorage.setItem('bd-name', mp.name); if (mp.colorManual) localStorage.setItem('bd-color', mp.color); } catch (err) {}
+    try { localStorage.setItem('bd-name', mp.name); if (mp.colorManual) localStorage.setItem('bd-color', mp.prefColor || mp.color); } catch (err) {}
     clearTimeout(mp.helloTimer);
     mp.helloTimer = setTimeout(mpHello, 500);
   }
@@ -3111,14 +3115,25 @@
     row.appendChild(nameIn); slot.appendChild(row);
     var sw = mel('div', 'mp-row');
     MP_COLORS.forEach(function (col) {
-      var b = mel('button', 'mp-sw' + (col === mp.color ? ' sel' : '')); b.type = 'button'; b.style.background = col; b.setAttribute('aria-label', 'Car color ' + col);
-      b.addEventListener('click', function (e) { e.stopPropagation(); mp.color = col; mp.colorManual = true; applyOwnColor(); mpSaveMe(); mpRender(); });
+      var taken = col !== mp.color && colorTaken(col);
+      var b = mel('button', 'mp-sw' + (col === mp.color ? ' sel' : '') + (taken ? ' taken' : '')); b.type = 'button'; b.style.background = col; b.setAttribute('aria-label', 'Car color ' + col);
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (col !== mp.color && colorTaken(col)) { toast('Another driver already has that colour.'); return; }
+        mp.color = col; mp.prefColor = col; mp.colorManual = true; applyOwnColor(); mpSaveMe(); mpRender();
+      });
       sw.appendChild(b);
     });
     var cp = mel('input', 'mp-sw mp-custom'); cp.type = 'color'; cp.value = /^#[0-9a-f]{6}$/i.test(mp.color) ? mp.color : '#bf453c'; cp.setAttribute('aria-label', 'Pick any car color'); cp.title = 'Pick any color';
     cp.addEventListener('click', function (e) { e.stopPropagation(); });
-    cp.addEventListener('input', function () { mp.color = cp.value; mp.colorManual = true; applyOwnColor(); mpSaveMe(); });
-    cp.addEventListener('change', function () { mpRender(); });
+    cp.addEventListener('input', function () {
+      if (colorTaken(cp.value)) return;
+      mp.color = cp.value; mp.prefColor = cp.value; mp.colorManual = true; applyOwnColor(); mpSaveMe();
+    });
+    cp.addEventListener('change', function () {
+      if (colorTaken(cp.value)) { toast('Another driver already has a colour like that.'); cp.value = mp.color; }
+      mpRender();
+    });
     sw.appendChild(cp);
     slot.appendChild(sw);
     if (mp.status === 'solo') {
