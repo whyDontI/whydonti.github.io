@@ -2380,13 +2380,13 @@
 
   /* Camera views. C cycles them, drag to look around, scroll to zoom. */
   var VIEWS = [
+    { name: 'Cozy', dist: 22, h: 12.5, look: 2, lookH: 0.4, yaw: 0.72 },
     { name: 'Chase', dist: 9, h: 3.9, look: 5, lookH: 1.6 },
-    { name: 'Cozy', dist: 15, h: 9, look: 2, lookH: 0.4, yaw: 0.72 },
     { name: 'Low', dist: 6.2, h: 1.9, look: 9, lookH: 1.2 },
     { name: 'High', dist: 16, h: 9.5, look: 3, lookH: 0.5 },
     { name: 'Hood', hood: true }
   ];
-  var viewIdx = 0, camV = { dist: 9, h: 3.9, look: 5, lookH: 1.6, yaw: 0 };
+  var viewIdx = 0, camV = { dist: 22, h: 12.5, look: 2, lookH: 0.4, yaw: 0.72 };
   var orbYaw = 0, orbPitch = 0, zoom = 1, dragging = false, lastDrag = 0, lastX = 0, lastY = 0;
   var viewBtn = $('view');
   var resetting = false;
