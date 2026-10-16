@@ -154,6 +154,10 @@
   .mp-input:focus-visible, .mp-sw:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   .mp-sw { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; }
   .mp-sw.sel { border-color: var(--ink); }
+  .mp-custom { -webkit-appearance: none; appearance: none; background: conic-gradient(#e05a4f, #e0b04f, #6bbf5e, #4fb5e0, #8a6bd8, #d86ba8, #e05a4f); overflow: hidden; }
+  .mp-custom::-webkit-color-swatch-wrapper { padding: 0; }
+  .mp-custom::-webkit-color-swatch { border: 0; opacity: 0; }
+  .mp-custom::-moz-color-swatch { border: 0; opacity: 0; }
   .mp-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
   .mp-pl { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
   .mp-pl .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -275,6 +279,10 @@
   .touch-on .chip { display: flex; }
   .touch-on .gauges .gear { min-width: 0; padding: 6px 12px; font-size: 13px; }
   .touch-on .hint { top: 58px; bottom: auto; padding: 0 16px; }
+  .radar { position: absolute; left: 16px; top: 112px; width: 132px; height: 132px; border-radius: 50%; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; box-shadow: 0 6px 24px rgba(10, 5, 30, 0.3); }
+  .radar.on { opacity: 1; }
+  .nohud .radar { opacity: 0 !important; }
+  .touch-on .radar { top: 56px; left: max(14px, env(safe-area-inset-left)); width: 104px; height: 104px; }
   /* Always-on HUD pieces skip backdrop blur: blurring the live 3D canvas every frame costs a lot of GPU memory and time */
   .tod, .gear, .icon-btn, .gauge, .chip, .tbtn, .toast, .mixer { backdrop-filter: none; -webkit-backdrop-filter: none; }
   @media (prefers-reduced-motion: reduce) {
@@ -335,6 +343,7 @@
   </div>
   <div class="mixer" id="mpPop" role="group" aria-label="Play together"><div class="mix-title">Play together</div><div class="mp-slot"></div></div>
   <div class="mixer" id="mixer" role="group" aria-label="Volume"><div class="mix-title">Volume</div><div class="mix-slot"></div></div>
+  <canvas class="radar" id="radar" aria-hidden="true"></canvas>
   <div class="toast" id="toast" role="status"></div>
 
   <div class="hint" id="hint">W A S D or arrows to drive. Shift: low range. F: RWD or 4WD. C: camera. H: hide display. Space: drift.</div>
@@ -2667,17 +2676,42 @@
   /* ------------------------------------------------------------------ */
   var MP_PREFIX = 'blobdrive-', MP_MAX = 6, MP_HZ = 15, MP_PUBLIC = 4;
   var MP_COLORS = ['#bf453c', '#d98a3d', '#6b9a5e', '#4f86a8', '#8a6bb8', '#c46a8f'];
+  var MP_AUTO = MP_COLORS.concat(['#d4b23a', '#3aa6a0', '#e07a5f', '#7f9a3a', '#2f5fa8', '#a8642c']);
   var MP_WA = ['maple', 'amber', 'cedar', 'misty', 'quiet', 'cozy', 'velvet', 'golden', 'hazel', 'copper', 'mossy', 'silver'];
   var MP_WB = ['fox', 'owl', 'pine', 'brook', 'lantern', 'ember', 'hill', 'fern', 'wren', 'cabin', 'trail', 'stone'];
   var mp = { peer: null, status: 'solo', host: false, code: '', myId: '', hostId: '', conns: {}, dialing: {}, players: {}, name: '', color: MP_COLORS[0], sendAcc: 0, tmAcc: 0, uiAcc: 0, placed: false, err: '', helloTimer: 0 };
   try {
     mp.name = localStorage.getItem('bd-name') || '';
     var savedColor = localStorage.getItem('bd-color');
-    if (savedColor && /^#[0-9a-f]{6}$/i.test(savedColor)) mp.color = savedColor;
+    if (savedColor && /^#[0-9a-f]{6}$/i.test(savedColor)) { mp.color = savedColor; mp.colorManual = true; }
   } catch (err) {}
+  /* Nobody picked a colour yet: hand out a random one */
+  if (!mp.colorManual) mp.color = MP_AUTO[Math.floor(Math.random() * MP_AUTO.length)];
   if (!mp.name) mp.name = 'Driver ' + (100 + Math.floor(Math.random() * 900));
   var mpOk = typeof Peer !== 'undefined';
   var mpBodyHex = new THREE.Color(BODY).getHex();
+  /* Our own car wears the chosen colour too, so everyone sees the same paint */
+  var ownBodyMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(mp.color) });
+  carG.traverse(function (o) {
+    if (o.isMesh && o.material && o.material.isMeshLambertMaterial && o.material.color && o.material.color.getHex() === mpBodyHex) o.material = ownBodyMat;
+  });
+  function applyOwnColor() { ownBodyMat.color.set(mp.color); }
+  function colorDist(a, b) { var A = new THREE.Color(a), B = new THREE.Color(b); return Math.hypot(A.r - B.r, A.g - B.g, A.b - B.b); }
+  /* If we never picked a colour and someone in the room already has one like it, switch to a free one */
+  function mpEnsureUnique() {
+    if (mp.colorManual || mp.status !== 'room') return;
+    var ids = Object.keys(mp.players), clash = false, i;
+    for (i = 0; i < ids.length; i++) {
+      var q = mp.players[ids[i]];
+      if (colorDist(q.color, mp.color) < 0.2 && (q.man || mp.myId > ids[i])) clash = true;
+    }
+    if (!clash) return;
+    var pool = MP_AUTO.filter(function (c) { return ids.every(function (id) { return colorDist(mp.players[id].color, c) >= 0.2; }); });
+    mp.color = pool.length ? pool[Math.floor(Math.random() * pool.length)] : '#' + new THREE.Color().setHSL(Math.random(), 0.55, 0.5).getHexString();
+    applyOwnColor();
+    mpHello();
+    mpRender();
+  }
   var mpBtn = $('mpBtn'), mpPop = $('mpPop');
 
   function r2(v) { v = +v; return isFinite(v) ? Math.round(v * 100) / 100 : 0; }
@@ -2697,7 +2731,7 @@
     for (i = 0; i < list.length; i++) {
       var o = list[i];
       if (o.isLight) kill.push(o);
-      else if (o.isMesh && o.material && o.material.isMeshLambertMaterial && o.material.color && o.material.color.getHex() === mpBodyHex) o.material = mat;
+      else if (o.isMesh && o.material && (o.material === ownBodyMat || (o.material.isMeshLambertMaterial && o.material.color && o.material.color.getHex() === mpBodyHex))) o.material = mat;
     }
     var rw = [];
     for (i = 0; i < wheels.length; i++) {
@@ -2769,7 +2803,7 @@
       if (c && c.open) { try { c.send(msg); } catch (err) {} }
     }
   }
-  function mpHello() { mpSend({ t: 'hi', name: mp.name, color: mp.color }); }
+  function mpHello() { mpSend({ t: 'hi', name: mp.name, color: mp.color, man: mp.colorManual ? 1 : 0 }); }
   function mpPlaceNear(p) {
     var tg = p.tgt, s = Math.sin(tg.th), c = Math.cos(tg.th);
     car.x = tg.x - s * 8 + c * 4; car.z = tg.z - c * 8 - s * 4;
@@ -2791,7 +2825,9 @@
     if (!d || typeof d !== 'object') return;
     var id = conn.peer;
     if (d.t === 'hi') {
-      mpAddPlayer(id, d.name, d.color);
+      var hp = mpAddPlayer(id, d.name, d.color);
+      hp.man = !!d.man;
+      mpEnsureUnique();
     } else if (d.t === 's') {
       var p = mp.players[id];
       if (!p) p = mpAddPlayer(id, 'Driver', MP_COLORS[0]);
@@ -2824,7 +2860,7 @@
         return;
       }
       mp.conns[conn.peer] = conn;
-      try { conn.send({ t: 'hi', name: mp.name, color: mp.color }); } catch (err) {}
+      try { conn.send({ t: 'hi', name: mp.name, color: mp.color, man: mp.colorManual ? 1 : 0 }); } catch (err) {}
       if (mp.host) {
         var others = Object.keys(mp.conns).filter(function (x) { return x !== conn.peer; });
         try { conn.send({ t: 'peers', list: others }); } catch (err) {}
@@ -2965,6 +3001,57 @@
     var stop = setInterval(function () { if (mp.status !== 'connecting') { clearTimeout(timer); clearInterval(stop); } }, 500);
   }
 
+  /* Radar: you in the middle facing up, other drivers as coloured dots. Far-away drivers pin to the edge with their distance. */
+  var radarEl = $('radar'), radarCtx = radarEl.getContext ? radarEl.getContext('2d') : null, radarPx = 0, radarTier = 0;
+  var RADAR_TIERS = [120, 250, 500, 1000, 2000];
+  function updateRadar() {
+    if (!radarCtx) return;
+    var ids = mp.status === 'room' ? Object.keys(mp.players) : [], now = performance.now() / 1000, list = [], i;
+    for (i = 0; i < ids.length; i++) {
+      var q = mp.players[ids[i]];
+      if (q && q.has && now - q.tgt.at < 8) list.push(q);
+    }
+    var on = list.length > 0;
+    radarEl.classList.toggle('on', on);
+    if (!on) return;
+    var css = radarEl.clientWidth || 132, ratio = Math.min(window.devicePixelRatio || 1, 2), px = Math.round(css * ratio);
+    if (radarPx !== px) { radarEl.width = px; radarEl.height = px; radarPx = px; }
+    var g = radarCtx, c = px / 2, R = c - 3 * ratio;
+    var far = 0, dists = [];
+    for (i = 0; i < list.length; i++) { var dd = Math.hypot(list[i].cur.x - car.x, list[i].cur.z - car.z); dists.push(dd); if (dd > far) far = dd; }
+    var tier = 0;
+    while (tier < RADAR_TIERS.length - 1 && RADAR_TIERS[tier] < far * 1.1) tier++;
+    var range = RADAR_TIERS[tier], sc = R / range;
+    var sn = Math.sin(car.th), cs = Math.cos(car.th);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, px, px);
+    g.beginPath(); g.arc(c, c, R, 0, 6.2832); g.fillStyle = 'rgba(34, 24, 52, 0.62)'; g.fill();
+    g.lineWidth = ratio; g.strokeStyle = 'rgba(255, 243, 228, 0.22)'; g.stroke();
+    g.beginPath(); g.arc(c, c, R * 0.5, 0, 6.2832); g.strokeStyle = 'rgba(255, 243, 228, 0.12)'; g.stroke();
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    /* you */
+    g.beginPath(); g.moveTo(c, c - 7 * ratio); g.lineTo(c + 5 * ratio, c + 5 * ratio); g.lineTo(c, c + 2 * ratio); g.lineTo(c - 5 * ratio, c + 5 * ratio); g.closePath();
+    g.fillStyle = '#ffb36b'; g.fill();
+    /* others */
+    for (i = 0; i < list.length; i++) {
+      var p = list[i], dx = p.cur.x - car.x, dz = p.cur.z - car.z;
+      var f = dx * sn + dz * cs, r = -dx * cs + dz * sn;
+      var d = dists[i], k = d * sc > R - 7 * ratio ? (R - 7 * ratio) / (d * sc) : 1;
+      var x = c + r * sc * k, y = c - f * sc * k, clamped = k < 1;
+      g.beginPath(); g.arc(x, y, 6 * ratio, 0, 6.2832);
+      g.fillStyle = p.color; g.fill();
+      g.lineWidth = 1.5 * ratio; g.strokeStyle = clamped ? 'rgba(255, 243, 228, 0.9)' : 'rgba(20, 12, 36, 0.8)'; g.stroke();
+      g.fillStyle = '#fff'; g.font = '700 ' + Math.round(8 * ratio) + 'px sans-serif';
+      g.fillText((p.name || '?').charAt(0).toUpperCase(), x, y + 0.5 * ratio);
+      if (clamped) {
+        g.fillStyle = 'rgba(255, 243, 228, 0.85)'; g.font = '600 ' + Math.round(8 * ratio) + 'px sans-serif';
+        g.fillText(d >= 1000 ? (d / 1000).toFixed(1) + 'km' : Math.round(d) + 'm', c + (x - c) * 0.72, c + (y - c) * 0.72);
+      }
+    }
+    g.fillStyle = 'rgba(255, 243, 228, 0.5)'; g.font = '600 ' + Math.round(8 * ratio) + 'px sans-serif';
+    g.fillText(range >= 1000 ? range / 1000 + ' km' : range + ' m', c, px - 7 * ratio);
+  }
+
   /* every frame: send our car, move theirs */
   function mpUpdate(dt, t) {
     if (mp.status !== 'room') return;
@@ -3011,7 +3098,7 @@
   /* panel */
   function mel(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function mpSaveMe() {
-    try { localStorage.setItem('bd-name', mp.name); localStorage.setItem('bd-color', mp.color); } catch (err) {}
+    try { localStorage.setItem('bd-name', mp.name); if (mp.colorManual) localStorage.setItem('bd-color', mp.color); } catch (err) {}
     clearTimeout(mp.helloTimer);
     mp.helloTimer = setTimeout(mpHello, 500);
   }
@@ -3025,9 +3112,14 @@
     var sw = mel('div', 'mp-row');
     MP_COLORS.forEach(function (col) {
       var b = mel('button', 'mp-sw' + (col === mp.color ? ' sel' : '')); b.type = 'button'; b.style.background = col; b.setAttribute('aria-label', 'Car color ' + col);
-      b.addEventListener('click', function (e) { e.stopPropagation(); mp.color = col; mpSaveMe(); mpRender(); });
+      b.addEventListener('click', function (e) { e.stopPropagation(); mp.color = col; mp.colorManual = true; applyOwnColor(); mpSaveMe(); mpRender(); });
       sw.appendChild(b);
     });
+    var cp = mel('input', 'mp-sw mp-custom'); cp.type = 'color'; cp.value = /^#[0-9a-f]{6}$/i.test(mp.color) ? mp.color : '#bf453c'; cp.setAttribute('aria-label', 'Pick any car color'); cp.title = 'Pick any color';
+    cp.addEventListener('click', function (e) { e.stopPropagation(); });
+    cp.addEventListener('input', function () { mp.color = cp.value; mp.colorManual = true; applyOwnColor(); mpSaveMe(); });
+    cp.addEventListener('change', function () { mpRender(); });
+    sw.appendChild(cp);
     slot.appendChild(sw);
     if (mp.status === 'solo') {
       var r2row = mel('div', 'mp-row');
@@ -3127,7 +3219,7 @@
     updateDust(dt);
     if (frame % 4 === 0) { audio.update(audioDt, car.speed, car.maxV, inp.thr, !car.air, now * 0.001, S.kind, gear, car); audioDt = 0; }
     if (frame % 3 === 0) updateGauges();
-    if (frame % 6 === 0) updateHud();
+    if (frame % 6 === 0) { updateHud(); updateRadar(); }
     renderer.render(scene, camera);
   }
   updateHud();
