@@ -1,4 +1,4 @@
-# blobDrive → Discord notifier
+# BlobDrive → Discord notifier
 
 A tiny Cloudflare Worker (free tier is plenty). The game posts `{event, name, players}` here and the Worker
 sends a fixed-format message to your Discord webhook. The webhook URL stays a secret on the Worker, so it is

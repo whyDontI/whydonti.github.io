@@ -9,10 +9,30 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="blobDrive">
+<meta name="apple-mobile-web-app-title" content="BlobDrive">
 <script data-goatcounter="https://nikhil-bhandarkar.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
-<title>blobDrive</title>
+<title>BlobDrive: Free Multiplayer Offroad Game in Your Browser</title>
+<meta name="description" content="Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.">
+<meta name="author" content="Nikhil Bhandarkar">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://www.nikhilbuilds.xyz/products/blobdrive/">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nikhil Bhandarkar">
+<meta property="og:title" content="BlobDrive: Free Multiplayer Offroad Game in Your Browser">
+<meta property="og:description" content="Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.">
+<meta property="og:url" content="https://www.nikhilbuilds.xyz/products/blobdrive/">
+<meta property="og:image" content="https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A red offroad jeep driving over low-poly hills at dusk in BlobDrive">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BlobDrive: Free Multiplayer Offroad Game in Your Browser">
+<meta name="twitter:description" content="Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.">
+<meta name="twitter:image" content="https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "BlobDrive", "url": "https://www.nikhilbuilds.xyz/products/blobdrive/", "description": "Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.", "image": "https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg", "genre": ["Driving", "Casual", "Multiplayer"], "applicationCategory": "Game", "operatingSystem": "Any (web browser)", "gamePlatform": "Web browser", "playMode": "MultiPlayer", "inLanguage": "en", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}, "author": {"@type": "Person", "name": "Nikhil Bhandarkar", "url": "https://www.nikhilbuilds.xyz/"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
@@ -301,6 +321,7 @@
 </style>
 </head>
 <body>
+<noscript><h1>BlobDrive</h1><p>BlobDrive is a free multiplayer offroad driving game that runs in your browser. Drive a jeep through endless low-poly hills, mud and water at night, and share the room with friends. It needs JavaScript to run, so please turn it on and reload.</p></noscript>
 <div id="app">
   <div class="hud" id="hud">
     <div class="readout">
@@ -347,7 +368,7 @@
     <div class="ctl-card" role="dialog" aria-label="Full screen on iPhone">
       <div class="ctl-head"><h2>Full screen on iPhone</h2><button class="ctl-x" id="fsHelpClose" type="button" aria-label="Close">&times;</button></div>
       <p class="fs-note">Safari and Chrome on iPhone cannot hide their bars from a web page. Install the game instead:</p>
-      <ol class="fs-steps"><li>Tap the Share button in your browser.</li><li>Choose <b>Add to Home Screen</b>.</li><li>Open <b>blobDrive</b> from your home screen. It runs full screen, with no browser bars.</li></ol>
+      <ol class="fs-steps"><li>Tap the Share button in your browser.</li><li>Choose <b>Add to Home Screen</b>.</li><li>Open <b>BlobDrive</b> from your home screen. It runs full screen, with no browser bars.</li></ol>
     </div>
   </div>
   <div class="rotate" id="rotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 17v2"/></svg><div>Rotate your phone to landscape to drive</div></div>
@@ -414,7 +435,7 @@
 
   <div class="intro" id="intro">
     <div class="panel">
-      <h1>blobDrive</h1>
+      <h1>BlobDrive</h1>
       <p>An endless offroad drive through soft, rolling hills. No missions, no timer, no finish line. Crawl over rocks, splash through mud and water, and watch the sky change slowly.</p>
       <button class="ctl-toggle" id="ctlToggle" type="button" aria-expanded="false" aria-controls="keysList">Controls</button>
       <dl class="keys" id="keysList" hidden>
@@ -503,7 +524,7 @@
   });
   if (!window.THREE) {
     track('error-3d-library-missing', true);
-    $('intro').querySelector('.panel').innerHTML = '<h1>blobDrive</h1><p>The 3D library could not load. Check your connection and reload the page.</p>';
+    $('intro').querySelector('.panel').innerHTML = '<h1>BlobDrive</h1><p>The 3D library could not load. Check your connection and reload the page.</p>';
     return;
   }
 

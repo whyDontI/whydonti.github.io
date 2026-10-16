@@ -15,7 +15,7 @@ export const projects = [
     ],
   },
   {
-    title: "blobDrive",
+    title: "BlobDrive",
     url: "/products/blobdrive/",
     image: "/projects/blobdrive.jpg",
     description:

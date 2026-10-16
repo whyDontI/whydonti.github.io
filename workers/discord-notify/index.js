@@ -1,4 +1,4 @@
-// Forwards "someone joined the public room" pings from the blobDrive game to a Discord webhook.
+// Forwards "someone joined the public room" pings from the BlobDrive game to a Discord webhook.
 // The webhook URL lives only in the DISCORD_WEBHOOK_URL secret, never in the site's public code.
 
 const ALLOWED_ORIGINS = ["https://www.nikhilbuilds.xyz", "https://nikhilbuilds.xyz"];
@@ -48,7 +48,7 @@ export default {
     const res = await fetch(env.DISCORD_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "blobDrive", content, allowed_mentions: { parse: [] } }),
+      body: JSON.stringify({ username: "BlobDrive", content, allowed_mentions: { parse: [] } }),
     });
     return new Response(null, { status: res.ok ? 204 : 502, headers: cors(origin) });
   },

@@ -1,6 +1,6 @@
 {
-  "name": "blobDrive",
-  "short_name": "blobDrive",
+  "name": "BlobDrive",
+  "short_name": "BlobDrive",
   "description": "A cozy multiplayer off-roading game that runs in your browser.",
   "id": "/products/blobdrive/",
   "start_url": "/products/blobdrive/",
