@@ -14,4 +14,12 @@ export const projects = [
       { text: "résumé", url: "/resume" },
     ],
   },
+  {
+    title: "blobDrive",
+    url: "/products/blobdrive/",
+    description:
+      'A cozy multiplayer off-roading game that runs in the browser. Drive through hills, mud and water, then share a link so friends can join. <strong class="kw">Peer-to-peer</strong> over WebRTC, <em class="emph">no game server to run.</em>',
+    stack: "Three.js · WebRTC · PeerJS",
+    links: [{ text: "play", url: "/products/blobdrive/" }],
+  },
 ];
