@@ -2766,8 +2766,13 @@
   /* PeerJS), no accounts and no server of your own. Cars pass through   */
   /* each other, so nobody can get stuck on a friend.                    */
   /* ------------------------------------------------------------------ */
-  var MP_PREFIX = 'blobdrive-', MP_MAX = 6, MP_HZ = 15, MP_PUBLIC_CODE = 'public', MP_PUBLIC_MAX = 8;
-  function mpCap() { return mp.code === MP_PUBLIC_CODE ? MP_PUBLIC_MAX : MP_MAX; }
+  var MP_PREFIX = 'blobdrive-', MP_MAX = 6, MP_HZ = 15, MP_PUBLIC_CODE = 'public', MP_PUBLIC_MAX = 12;
+  /* Quiet while we are looking after the public room for the player: they should never see connection trouble there */
+  function mpToast(msg) { if (!mp.auto && !mp.quick) toast(msg); }
+  /* Public rooms: "public", then "public-2", "public-3"... when the earlier ones are full. Same permanent ids forever. */
+  function mpPublicCode(slot) { return slot <= 1 ? MP_PUBLIC_CODE : MP_PUBLIC_CODE + '-' + slot; }
+  function isPublic(code) { return code === MP_PUBLIC_CODE || /^public-\d+$/.test(code || ''); }
+  function mpCap() { return isPublic(mp.code) ? MP_PUBLIC_MAX : MP_MAX; }
   var MP_COLORS = ['#bf453c', '#d98a3d', '#6b9a5e', '#4f86a8', '#8a6bb8', '#c46a8f'];
   var MP_AUTO = MP_COLORS.concat(['#d4b23a', '#3aa6a0', '#e07a5f', '#7f9a3a', '#2f5fa8', '#a8642c']);
   var MP_WA = ['maple', 'amber', 'cedar', 'misty', 'quiet', 'cozy', 'velvet', 'golden', 'hazel', 'copper', 'mossy', 'silver'];
@@ -2922,11 +2927,14 @@
   }
   function mpOnData(conn, d) {
     if (!d || typeof d !== 'object') return;
+    if (mp.conns[conn.peer] !== conn) return;   // rejected or stale connection
     var id = conn.peer;
     if (d.t === 'hi') {
       var isNew = !mp.players[id];
+      if (id === mp.hostId && !mp.host && !mp.joinTracked) { mp.joinTracked = true; track(mp.lastQuick ? 'quick-join-success' : 'room-joined'); }
       var hp = mpAddPlayer(id, d.name, d.color);
-      if (isNew && mp.host && mp.code === MP_PUBLIC_CODE) notify('joined', cleanName(d.name), Object.keys(mp.players).length + 1);
+      if (isNew && id !== mp.hostId && performance.now() - (mp.roomAt || 0) > 3000) { toast(cleanName(d.name) + ' joined'); track('player-joined-popup'); }
+      if (isNew && mp.host && isPublic(mp.code)) notify('joined', cleanName(d.name), Object.keys(mp.players).length + 1);
       hp.man = !!d.man;
       mpEnsureUnique();
     } else if (d.t === 's') {
@@ -2947,9 +2955,10 @@
     } else if (d.t === 'tm') {
       if (id === mp.hostId) { var g = +d.g; if (isFinite(g) && g >= 0 && g <= 1) gameT = g; }
     } else if (d.t === 'full') {
-      track(mp.quick ? 'public-room-full' : 'room-full');
-      toast(mp.quick ? 'The public room is full (' + MP_PUBLIC_MAX + ' drivers). Create your own room instead.' : 'That room is full.');
-      mpLeave();
+      var fullSlot = mp.quick || mp.lastQuick;
+      track(fullSlot ? 'public-room-full' : 'room-full');
+      if (fullSlot && fullSlot < 50) { var nextSlot = fullSlot + 1; mpResetPeer(); mpJoin(mpPublicCode(nextSlot), nextSlot); }
+      else { mpToast('That room is full.'); mpLeave(); }
     }
   }
   function mpWire(conn) {
@@ -2970,7 +2979,7 @@
         others.forEach(function (x) { var c = mp.conns[x]; if (c && c.open) { try { c.send({ t: 'new', id: conn.peer }); } catch (err) {} } });
         try { conn.send({ t: 'tm', g: gameT }); } catch (err) {}
       }
-      if (mp.status === 'connecting') { if (!mp.host) track(mp.quick ? 'quick-join-success' : 'room-joined'); mp.status = 'room'; mp.quick = 0; }
+      if (mp.status === 'connecting') { mp.status = 'room'; mp.quick = 0; mp.quickTries = 0; mp.roomAt = performance.now(); }
       if (conn.peer === mp.hostId && !mp.host) { mp.claimActive = false; mp.claiming = -1; clearTimeout(mp.claimTimer); clearTimeout(mp.claimNext); }
       mpRender();
     });
@@ -3005,7 +3014,7 @@
         if (mp.status !== 'connecting' || mp.peer !== p) return;
         if (mp.quick) {
           /* nobody is hosting this public room yet, so open it ourselves */
-          var slot = mp.quick; mpResetPeer(); mpCreate(MP_PUBLIC_CODE, slot);
+          var slot = mp.quick; mpResetPeer(); mpCreate(mpPublicCode(slot), slot);
         } else if (mp.joinTries++ < 4 && mp.hostId) {
           if (mp.joinTries === 1) toast('Looking for the room...');
           delete mp.dialing[mp.hostId];
@@ -3014,10 +3023,10 @@
         return;
       }
       if (type === 'network' || type === 'server-error' || type === 'socket-error' || type === 'socket-closed') {
-        if (mp.status === 'connecting') { track('connect-failed'); toast('Could not reach the connection service. Check your internet.'); mpLeave(); }
+        if (mp.status === 'connecting') { track('connect-failed'); mpToast('Could not reach the connection service. Check your internet.'); mpLeave(); }
         return;
       }
-      if (mp.status === 'connecting') { toast('Could not start multiplayer (' + (type || 'unknown error') + ').'); mpLeave(); }
+      if (mp.status === 'connecting') { mpToast('Could not start multiplayer (' + (type || 'unknown error') + ').'); mpLeave(); }
     });
   }
   /* A host's link to the PeerJS broker drops when the tab sleeps (for example while sharing the invite from another app). Keep trying to restore it. */
@@ -3043,6 +3052,10 @@
       if (!p.open && err && err.type === 'unavailable-id') { try { p.destroy(); } catch (e) {} setTimeout(function () { mpReopenHost(code, n + 1); }, 4000); }
     });
   }
+  /* Nobody drives alone: whenever the game has started and we are in no room, go (back) to the public room */
+  setInterval(function () {
+    if (started && mpOk && mp.status === 'solo') { mp.auto = true; mpQuick(); }
+  }, 4000);
   /* Heartbeat: a crashed browser or a phone that lost signal sends no goodbye, so every driver pings the others and drops anyone who has gone silent. */
   setInterval(function () {
     if (mp.status !== 'room') return;
@@ -3106,12 +3119,12 @@
   }
   function mpQuick() {
     if (!mpOk || mp.status !== 'solo') return;
-    mpJoin(MP_PUBLIC_CODE, 1);
+    mpJoin(mpPublicCode(1), 1);
   }
   function mpLeave() {
     var p = mp.peer;
     clearTimeout(mp.claimTimer); clearTimeout(mp.claimNext); mp.claimActive = false; mp.claiming = -1; mp.auto = false;
-    mp.quick = 0; mp.joinTries = 0;
+    mp.quick = 0; mp.joinTries = 0; mp.quickTries = 0;
     mp.peer = null; mp.status = 'solo'; mp.host = false; mp.code = ''; mp.myId = ''; mp.hostId = ''; mp.placed = false;
     Object.keys(mp.players).forEach(function (id) { dropVisuals(mp.players[id]); });
     mp.players = {}; mp.conns = {}; mp.dialing = {};
@@ -3126,14 +3139,14 @@
     (function attempt() {
       var code = fixed || (MP_WA[Math.floor(Math.random() * MP_WA.length)] + '-' + MP_WB[Math.floor(Math.random() * MP_WB.length)] + '-' + (10 + Math.floor(Math.random() * 90)));
       var p;
-      try { p = new Peer(MP_PREFIX + code); } catch (err) { toast('Could not start multiplayer.'); mpLeave(); return; }
+      try { p = new Peer(MP_PREFIX + code); } catch (err) { mpToast('Could not start multiplayer.'); mpLeave(); return; }
       var opened = false;
       p.on('open', function (id) {
         opened = true;
         if (mp.status !== 'connecting') { try { p.destroy(); } catch (err) {} return; }
-        mp.peer = p; mp.myId = id; mp.hostId = id; mp.host = true; mp.code = code; mp.status = 'room'; mp.quick = 0;
+        mp.peer = p; mp.myId = id; mp.hostId = id; mp.host = true; mp.code = code; mp.status = 'room'; mp.quick = 0; mp.quickTries = 0; mp.roomAt = performance.now();
         track(fixed ? 'public-room-hosted' : 'room-created');
-        if (fixed === MP_PUBLIC_CODE) notify('opened', mp.name, 1);
+        if (isPublic(fixed)) notify('opened', mp.name, 1);
         mpSetupPeer(p);
         mpRender();
         if (!mp.auto) toast(fixed ? 'You opened a public room. Others who tap Quick join will land here.' : 'Room ' + code + ' is open. Share the invite link.');
@@ -3143,7 +3156,7 @@
         if (err && err.type === 'unavailable-id' && fixed) { try { p.destroy(); } catch (e) {} mpJoin(fixed, slot); return; }
         if (err && err.type === 'unavailable-id' && tries++ < 6) { try { p.destroy(); } catch (e) {} attempt(); return; }
         try { p.destroy(); } catch (e) {}
-        if (mp.status === 'connecting') { track('connect-failed'); toast('Could not reach the connection service. Check your internet.'); mpLeave(); }
+        if (mp.status === 'connecting') { track('connect-failed'); mpToast('Could not reach the connection service. Check your internet.'); mpLeave(); }
       });
     })();
   }
@@ -3151,11 +3164,21 @@
     if (!mpOk || (mp.status !== 'solo' && !quickSlot)) return;
     var code = String(raw || '').toLowerCase().trim().replace(/^.*room=/, '').replace(MP_PREFIX, '');
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(code) || code.length < 3 || code.length > 40) { toast('That room code does not look right.'); return; }
-    mp.quick = quickSlot || 0; mp.joinTries = 0;
+    mp.quick = quickSlot || 0; mp.lastQuick = mp.quick; mp.joinTries = 0; mp.joinTracked = false;
     mp.status = 'connecting'; mp.err = ''; mpRender();
     var p;
-    try { p = new Peer(); } catch (err) { toast('Could not start multiplayer.'); mpLeave(); return; }
-    var timer = setTimeout(function () { if (mp.status === 'connecting' && mp.peer === p) { toast('Could not reach that room. Ask your friend to check it is still open.'); mpLeave(); } }, 15000);
+    try { p = new Peer(); } catch (err) { mpToast('Could not start multiplayer.'); mpLeave(); return; }
+    /* The public room: if the host's id is still registered at the broker but nobody answers (the host just closed), keep quietly retrying and take the room over once the stale id expires */
+    var timer = setTimeout(function () {
+      if (mp.status !== 'connecting' || mp.peer !== p) return;
+      if (mp.quick) {
+        track('public-join-stalled');
+        mp.quickTries = (mp.quickTries || 0) + 1;
+        var slot = mp.quick; mpResetPeer(); mpCreate(mpPublicCode(slot), slot);
+        return;
+      }
+      toast('Could not reach that room. Ask your friend to check it is still open.'); mpLeave();
+    }, mp.quick ? 8000 : 15000);
     p.on('open', function (id) {
       if (mp.status !== 'connecting') { try { p.destroy(); } catch (err) {} return; }
       mp.peer = p; mp.myId = id; mp.host = false; mp.code = code; mp.hostId = MP_PREFIX + code;
@@ -3163,7 +3186,7 @@
       mpDial(mp.hostId);
     });
     p.on('connection', function () {});
-    p.on('error', function () { if (mp.status === 'connecting' && !mp.peer) { track('connect-failed'); toast('Could not reach the connection service. Check your internet.'); mpLeave(); } });
+    p.on('error', function () { if (mp.status === 'connecting' && !mp.peer) { track('connect-failed'); mpToast('Could not reach the connection service. Check your internet.'); mpLeave(); } });
     var stop = setInterval(function () { if (mp.status !== 'connecting') { clearTimeout(timer); clearInterval(stop); } }, 500);
   }
 
@@ -3317,11 +3340,15 @@
     } else if (mp.status === 'connecting') {
       var cr = mel('div', 'mp-row');
       cr.appendChild(mel('span', 'ep-status', 'Connecting...'));
-      var cancel = mel('button', 'ep-link', 'Cancel'); cancel.type = 'button';
-      cancel.addEventListener('click', function (e) { e.stopPropagation(); mpLeave(); });
-      cr.appendChild(cancel); slot.appendChild(cr);
+      if (mp.auto || mp.quick) cr.firstChild.textContent = 'Joining the public room...';
+      else {
+        var cancel = mel('button', 'ep-link', 'Cancel'); cancel.type = 'button';
+        cancel.addEventListener('click', function (e) { e.stopPropagation(); mpLeave(); });
+        cr.appendChild(cancel);
+      }
+      slot.appendChild(cr);
     } else {
-      slot.appendChild(mel('div', 'ep-status', (mp.code === MP_PUBLIC_CODE ? 'Public room' : 'Room ' + mp.code) + (mp.host && mp.code !== MP_PUBLIC_CODE ? ' (you opened it)' : '')));
+      slot.appendChild(mel('div', 'ep-status', (isPublic(mp.code) ? 'Public room' + (mp.code === MP_PUBLIC_CODE ? '' : ' ' + mp.code.slice(7)) : 'Room ' + mp.code) + (mp.host && !isPublic(mp.code) ? ' (you opened it)' : '')));
       var ir = mel('div', 'mp-row');
       var link = mel('input', 'mp-input'); link.type = 'text'; link.readOnly = true; link.value = mpInviteLink(); link.setAttribute('aria-label', 'Invite link');
       link.addEventListener('focus', function () { link.select(); });
@@ -3346,9 +3373,17 @@
       });
       slot.appendChild(ul);
       var lr = mel('div', 'mp-row');
-      var leave = mel('button', 'ep-link', 'Leave room'); leave.type = 'button';
-      leave.addEventListener('click', function (e) { e.stopPropagation(); track('room-left'); mpLeave(); });
-      lr.appendChild(leave); slot.appendChild(lr);
+      if (isPublic(mp.code)) {
+        /* Nobody drives alone: the public room cannot be left, only swapped for a private one */
+        var priv = mel('button', 'ep-btn', 'Create a private room'); priv.type = 'button';
+        priv.addEventListener('click', function (e) { e.stopPropagation(); track('create-room-click'); mpLeave(); mpCreate(); });
+        lr.appendChild(priv);
+      } else {
+        var leave = mel('button', 'ep-link', 'Back to the public room'); leave.type = 'button';
+        leave.addEventListener('click', function (e) { e.stopPropagation(); track('room-left'); mpLeave(); });
+        lr.appendChild(leave);
+      }
+      slot.appendChild(lr);
     }
   }
   function mpRender() {
