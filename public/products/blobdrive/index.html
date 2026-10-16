@@ -12,8 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="BlobDrive">
 <script data-goatcounter="https://nikhil-bhandarkar.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
-<title>BlobDrive: Free Multiplayer Offroad Game in Your Browser</title>
-<meta name="description" content="Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.">
+<title>BlobDrive: A Cozy Multiplayer Offroad Game in Your Browser</title>
+<meta name="description" content="A soothing, cozy multiplayer offroad driving game for your browser. Take the wheel or leave it on auto drive. Free, no download or signup.">
 <meta name="author" content="Nikhil Bhandarkar">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://www.nikhilbuilds.xyz/products/blobdrive/">
@@ -21,18 +21,18 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Nikhil Bhandarkar">
-<meta property="og:title" content="BlobDrive: Free Multiplayer Offroad Game in Your Browser">
-<meta property="og:description" content="Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.">
+<meta property="og:title" content="BlobDrive: A Cozy Multiplayer Offroad Game in Your Browser">
+<meta property="og:description" content="A soothing, cozy multiplayer offroad driving game for your browser. Take the wheel or leave it on auto drive. Free, no download or signup.">
 <meta property="og:url" content="https://www.nikhilbuilds.xyz/products/blobdrive/">
 <meta property="og:image" content="https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="A red offroad jeep driving over low-poly hills at dusk in BlobDrive">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="BlobDrive: Free Multiplayer Offroad Game in Your Browser">
-<meta name="twitter:description" content="Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.">
+<meta name="twitter:title" content="BlobDrive: A Cozy Multiplayer Offroad Game in Your Browser">
+<meta name="twitter:description" content="A soothing, cozy multiplayer offroad driving game for your browser. Take the wheel or leave it on auto drive. Free, no download or signup.">
 <meta name="twitter:image" content="https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "BlobDrive", "url": "https://www.nikhilbuilds.xyz/products/blobdrive/", "description": "Drive a jeep through endless low-poly hills at night. A free multiplayer offroad game in your browser: no download, no signup, play with friends.", "image": "https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg", "genre": ["Driving", "Casual", "Multiplayer"], "applicationCategory": "Game", "operatingSystem": "Any (web browser)", "gamePlatform": "Web browser", "playMode": "MultiPlayer", "inLanguage": "en", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}, "author": {"@type": "Person", "name": "Nikhil Bhandarkar", "url": "https://www.nikhilbuilds.xyz/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "BlobDrive", "url": "https://www.nikhilbuilds.xyz/products/blobdrive/", "description": "A soothing, cozy multiplayer offroad driving game for your browser. Take the wheel or leave it on auto drive. Free, no download or signup.", "image": "https://www.nikhilbuilds.xyz/products/blobdrive/og.jpg", "genre": ["Driving", "Casual", "Multiplayer"], "applicationCategory": "Game", "operatingSystem": "Any (web browser)", "gamePlatform": "Web browser", "playMode": "MultiPlayer", "inLanguage": "en", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock"}, "author": {"@type": "Person", "name": "Nikhil Bhandarkar", "url": "https://www.nikhilbuilds.xyz/"}, "keywords": "cozy game, soothing driving game, zen driving game, offroad game, offroading game, auto drive game, browser game, multiplayer driving game, game like Slow Roads, game like Over the Hill"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
@@ -157,6 +157,8 @@
     transition: transform 0.15s ease, filter 0.15s ease;
   }
   .go:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  .about-link { margin: 6px 0 0 !important; font-size: 13px !important; text-align: center; }
+  .about-link a { color: var(--ink-dim); }
   .note { margin-top: 12px !important; font-size: 13px !important; text-align: center; }
 
   .touch {
@@ -321,7 +323,7 @@
 </style>
 </head>
 <body>
-<noscript><h1>BlobDrive</h1><p>BlobDrive is a free multiplayer offroad driving game that runs in your browser. Drive a jeep through endless low-poly hills, mud and water at night, and share the room with friends. It needs JavaScript to run, so please turn it on and reload.</p></noscript>
+<noscript><h1>BlobDrive</h1><p>BlobDrive is a free, soothing multiplayer offroad driving game that runs in your browser, with an auto drive mode. Drive a jeep through endless low-poly hills, mud and water at night, and share the room with friends. It needs JavaScript to run, so please turn it on and reload.</p></noscript>
 <div id="app">
   <div class="hud" id="hud">
     <div class="readout">
@@ -436,7 +438,7 @@
   <div class="intro" id="intro">
     <div class="panel">
       <h1>BlobDrive</h1>
-      <p>An endless offroad drive through soft, rolling hills. No missions, no timer, no finish line. Crawl over rocks, splash through mud and water, and watch the sky change slowly.</p>
+      <p>A cozy, soothing, endless offroad drive through soft, rolling hills. No missions, no timer, no finish line. Crawl over rocks, splash through mud and water, and watch the sky change slowly.</p>
       <button class="ctl-toggle" id="ctlToggle" type="button" aria-expanded="false" aria-controls="keysList">Controls</button>
       <dl class="keys" id="keysList" hidden>
         <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Drive and steer (arrow keys work too)</dd>
@@ -488,6 +490,7 @@
       </div>
       <button class="go" id="go">Start driving</button>
       <p class="note">Music starts when you press the button.</p>
+      <p class="about-link"><a href="about/">About BlobDrive</a></p>
     </div>
   </div>
 </div>

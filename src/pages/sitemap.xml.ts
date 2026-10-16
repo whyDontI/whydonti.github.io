@@ -5,7 +5,7 @@ export async function GET() {
 
   // Writing is hidden until there's something to publish, so it's left out of the
   // sitemap for now. To bring it back: add "/writing" to staticRoutes and uncomment below.
-  const staticRoutes = ["/", "/projects", "/resume", "/contact", "/products/", "/products/blobdrive/", "/products/inboxledger/"];
+  const staticRoutes = ["/", "/projects", "/resume", "/contact", "/products/", "/products/blobdrive/", "/products/blobdrive/about/", "/products/inboxledger/"];
 
   // const posts = await getCollection("writing", ({ data }) => !data.draft);
   // const postRoutes = posts.map((post) => `/writing/${post.slug}`);
